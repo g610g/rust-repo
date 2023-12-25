@@ -2,14 +2,28 @@
 
 fn main() {
     let s1 = String::from("This is a word");
-    println!("{}", s1.len());
+    // println!("{}", s1.len());
     // let word = first_word(&s1, s1.len());
     let expression_if = if true {"True"} else {"False"};
     // looper();
-    println!("{}", fib_generator_recur(1));
-
+    // println!("{}", fib_generaor_recur(1));
+    let mut s1 = String::from("This is a word");
+    let s2 = string_slice(&s1);
+    let string_literal = "Another is a string literal"; 
+    let string_literal_first_word = string_slice(&string_literal);
+    println!("{}", s1);
+    println!("String literal first word: {}", string_literal_first_word);
 }
 
+fn string_slice(s1: &str) -> &str{
+    let bytes = s1.as_bytes();
+    for (index, &character) in bytes.iter().enumerate(){
+        if character == b' '{
+            return &s1[..index];
+        }
+    }
+    &s1[..]
+}
 fn fib_generator_recur(n: u32) -> u32{
     if (n == 1 || n == 0)
     {
