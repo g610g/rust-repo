@@ -1,84 +1,44 @@
 // use std::io;
-
+#[derive(Debug)]
+struct User{
+    active:bool,
+    username:String,
+    email:String,
+    sign_in_count:u64
+}
+struct Grades(u32, u32);
 fn main() {
-    let s1 = String::from("This is a word");
-    // println!("{}", s1.len());
-    // let word = first_word(&s1, s1.len());
-    let expression_if = if true {"True"} else {"False"};
-    // looper();
-    // println!("{}", fib_generaor_recur(1));
-    let mut s1 = String::from("This is a word");
-    let s2 = string_slice(&s1);
-    let string_literal = "Another is a string literal"; 
-    let string_literal_first_word = string_slice(&string_literal);
-    println!("{}", s1);
-    println!("String literal first word: {}", string_literal_first_word);
-}
-
-fn string_slice(s1: &str) -> &str{
-    let bytes = s1.as_bytes();
-    for (index, &character) in bytes.iter().enumerate(){
-        if character == b' '{
-            return &s1[..index];
-        }
-    }
-    &s1[..]
-}
-fn fib_generator_recur(n: u32) -> u32{
-    if (n == 1 || n == 0)
-    {
-        return n;
-    }
-    return fib_generator_recur(n - 1) + fib_generator_recur(n - 2);
-}
-fn fib_generator(n: u32)-> u32{
-    let mut result = 0;
-    let mut minus_1 = 1;
-    let mut minus_2 = 0;
-    if n == 0 {
-        return 0;
-    }else if n == 1 {
-        return 1;
-    }
-    for numbers  in (1..n){
-        result = minus_1 + minus_2;
-        minus_2 = minus_1;
-        minus_1 = result;
-    }
-    result
-
-}
-
-
-fn foor_loop()-> (){
-    for number in (1..5){
-        println!("{number}");
-    }
-}
-fn looper()-> () {
-    let mut counter = 1;
-    let multiplier = 1;
-    'outerloop: loop{
-        println!("counter value: {}", counter);
-        loop{
-            println!("inner result = {}", counter + multiplier);
-
-            if counter == 5{
-                break 'outerloop;
+    let mut user = User{
+        username:String::from("g6i1o0"),
+        active:true,
+        email:String::from("gio.gonzales@carsu.edu.ph"),
+        sign_in_count:1
+    };
+    let gio_grade = Grades(98, 97);
+    println!("{}", gio_grade.0);
+    let Grades(first_grade, second_grade) = gio_grade;
+    user.email = String::from("gio@gmail.com");
+    // steal_struct(user);
+    // println!("{:?}", user);
+    let user2 = build_user(dbg!(user));
+    println!("{}", user2.sign_in_count);
+    println!("{}", user2.email);   
+    fn string_slice(s1: &str) -> &str{
+        let bytes = s1.as_bytes();
+        for (index, &character) in bytes.iter().enumerate(){
+            if character == b' '{
+                return &s1[..index];
             }
-            counter += 1;
         }
-        // counter += 1;
-
+        &s1[..]
+}
+}
+fn build_user(user:User)-> User{
+    User{
+        email:String::from("test@gmail.com"),
+        ..user
     }
 }
-fn first_word(s: &String, str_len: usize)-> String {
-    let mut result = String::new();
-    for character in s.chars() {
-        if character == ' ' {
-           break;                
-        }
-        result.push(character);
-    }
-    return result;        
+fn steal_struct(user: User){
+    println!("{:?}", user);
 }
