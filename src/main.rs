@@ -23,6 +23,57 @@ enum Message{
     Write(String),
     ChangeColor(i32, i32, i32),
 }
+struct Square{
+    sides:u64
+}
+struct Circle{
+    radius: f64
+}
+struct Triangle{
+    base: u64,
+    height:u64
+}
+struct Rectangle{
+    length:u64,
+    width:u64
+}
+enum Shape{
+    Square(Square),
+    Triangle(Triangle),
+    Circle(Circle),
+    Rectangle(Rectangle),
+}
+enum Number{
+    Integer(u64),
+    Float(f64)
+}
+impl Shape{
+    fn determine_area(&self) -> Number {
+        match self{
+            Shape::Square(Square) => {
+                let area = Square.sides.pow(2);
+                println!("The shape is a square and the area is: {}", area);                
+                Number::Integer(area)
+            },
+            Shape::Triangle(Triangle) => {
+                let area = (Triangle.height * Triangle.base) * 2;
+                println!("The shape is a triangle and the area is: {}", area);
+                Number::Integer(area)
+            },
+            Shape::Circle(Circle) => {
+                let pi = 3.14;
+                let area = pi * Circle.radius.powf(2.0);
+                println!("The shape is circle and the area is :{}", area);
+                Number::Float(area)
+            }
+            Shape::Rectangle(Rectangle) => {
+                let area = Rectangle.length * Rectangle.width;
+                println!("The shape is rectangle and the area is :{}", area);
+                Number::Integer(area)
+            }
+        }
+    }
+}
 impl Message{
     fn call(&self){
         dbg!(&self);
@@ -80,7 +131,14 @@ fn main() {
     // println!("result: {}", not_quite_lisp(&my_str));
     println!("position: {}",note_quite_lisp_2(&my_str));
     let message = Message::ChangeColor(1,2,3);
-    message.call();
+    let square = Square{
+        sides:24
+    };
+    let my_shape = Shape::Square(square);
+    match my_shape.determine_area() {
+        Number::Integer(value) => {println!("{}", value)},
+        Number::Float(value) => {println!("{}", value)}
+    }
     fn string_slice(s1: &str) -> &str{
         let bytes = s1.as_bytes();
         for (index, &character) in bytes.iter().enumerate(){
@@ -142,3 +200,10 @@ fn note_quite_lisp_2(pattern: &str) -> u64{
     }
     position
 }
+// fn match_practice(shape: &Shape){
+//     match shape{
+//         Shape:Square(Square) => {
+//             let area = 
+//         }
+//     }
+// }
