@@ -36,26 +36,49 @@ fn main() {
     // println!("result: {}", not_quite_lisp(&my_str));
     // println!("position: {}",note_quite_lisp_2(&my_str));
     // let message = Message::ChangeColor(1,2,3);
-    let square = enums::Square{
-        sides:24
-    };
-    let circle = enums::Circle{
-        radius:2.14
-    };
-    let my_shape = enums::Shape::Circle(circle);
-    match my_shape.determine_area() {
-        enums::Number::Integer(value) => {println!("{}", value)}
-        enums::Number::Float(value) => {println!("{}", value)}
+//     let square = enums::Square{
+//         sides:24
+//     };
+//     let circle = enums::Circle{
+//         radius:2.14
+//     };
+//     let my_shape = enums::Shape::Circle(circle);
+//     match my_shape.determine_area() {
+//         enums::Number::Integer(value) => {println!("{}", value)}
+//         enums::Number::Float(value) => {println!("{}", value)}
+//     }
+//     fn string_slice(s1: &str) -> &str{
+//         let bytes = s1.as_bytes();
+//         for (index, &character) in bytes.iter().enumerate(){
+//             if character == b' '{
+//                 return &s1[..index];
+//             }
+//         }
+//         &s1[..]
+// }
+    let mut my_vec = vec![1,2,3,4,5];
+    read_vector(&my_vec);
+    let first_value = my_vec[2];
+    println!("{first_value}");
+
+    for i in &my_vec{
+        println!("{}", *i);
     }
-    fn string_slice(s1: &str) -> &str{
-        let bytes = s1.as_bytes();
-        for (index, &character) in bytes.iter().enumerate(){
-            if character == b' '{
-                return &s1[..index];
-            }
-        }
-        &s1[..]
+    // match first_value{
+    //     Some(i) => {println!("We have a value in the index value: {}", *i);}
+    //     None  => {println!("No Value is here");}
+    // }
+    // for i in &my_vec{
+    //     println!("{}", *i);
+    // }
+    // my_vec.push(3);
+    // println!("{}", *first_value);
+
 }
+fn read_vector(slice: &[usize]){
+    for i in slice{
+        println!("{i}");
+    }
 }
 // fn build_user(user:User)-> User{
 //     User{
