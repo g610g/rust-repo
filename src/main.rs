@@ -1,10 +1,15 @@
 // use std::io;
 mod enums;
 // use crate::enums::{Circle, Square, Number, Shape};
-
+use std::collections::HashMap;
 fn main() {
     
     let name = "Gio Gonzales";
+    let key = "one";
+    let mut map = HashMap::new();
+    map.insert(key, 1);
+    let mutable_reference = map.entry(key).or_insert(2);
+    // println!("{}", mutable_reference);
     //tuple struct
     // struct Box(u32, u32);
     // let my_box = Box(15, 17);
@@ -56,14 +61,9 @@ fn main() {
 //         }
 //         &s1[..]
 // }
-    let mut my_vec = vec![1,2,3,4,5];
-    read_vector(&my_vec);
-    let first_value = my_vec[2];
-    println!("{first_value}");
-
-    for i in &my_vec{
-        println!("{}", *i);
-    }
+    let mut my_list = vec![120, 50, 33, 47, 75];
+    my_list.sort();
+    println!("{}",  find_median(&my_list));
     // match first_value{
     //     Some(i) => {println!("We have a value in the index value: {}", *i);}
     //     None  => {println!("No Value is here");}
@@ -79,6 +79,31 @@ fn read_vector(slice: &[usize]){
     for i in slice{
         println!("{i}");
     }
+}
+fn find_median(my_list: &Vec<i32>) -> i32{
+    let length = my_list.len();
+    println!("{length}");
+    let mut mid : usize;
+    let mut result: i32 = 0;
+    if length % 2 == 0{
+        mid = (length / 2) - 1;
+        match my_list.get(mid){
+            Some(i) => {result+=i},
+            None => {}
+        }
+        match my_list.get(mid + 1){
+            Some(i) => {result+=i},
+            None => {}
+        }
+    }else{
+        mid = (length / 2);
+        println!("{mid}");
+        match my_list.get(mid){
+            Some(i) => {result+=i},
+            None => {}
+        }
+    }
+    return result;
 }
 // fn build_user(user:User)-> User{
 //     User{
