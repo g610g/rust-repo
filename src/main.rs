@@ -61,9 +61,8 @@ fn main() {
 //         }
 //         &s1[..]
 // }
-    let mut my_list = vec![120, 50, 33, 47, 75];
-    my_list.sort();
-    println!("{}",  find_median(&my_list));
+    let mut my_list = vec![120, 50, 33, 47, 75, 88, 99, 2, 1, 34, 1, 1];
+    println!("{}", find_mode(&my_list));
     // match first_value{
     //     Some(i) => {println!("We have a value in the index value: {}", *i);}
     //     None  => {println!("No Value is here");}
@@ -80,7 +79,8 @@ fn read_vector(slice: &[usize]){
         println!("{i}");
     }
 }
-fn find_median(my_list: &Vec<i32>) -> i32{
+fn find_median(my_list: &mut Vec<i32>) -> i32{
+    my_list.sort();
     let length = my_list.len();
     println!("{length}");
     let mut mid : usize;
@@ -96,7 +96,7 @@ fn find_median(my_list: &Vec<i32>) -> i32{
             None => {}
         }
     }else{
-        mid = (length / 2);
+        mid = length / 2;
         println!("{mid}");
         match my_list.get(mid){
             Some(i) => {result+=i},
@@ -104,6 +104,27 @@ fn find_median(my_list: &Vec<i32>) -> i32{
         }
     }
     return result;
+}
+fn find_mode(my_list: &Vec<i32>)-> i32{
+    let mut map = HashMap::new();
+    let mut max:i32 = -1;
+    let mut max_key: i32 = -1;
+    for i in my_list{
+        let count = map.entry(i).or_insert(0);
+        *count+=1;
+    }
+    for key in map.keys(){
+        match map.get_key_value(key){
+            Some(i) => {
+                if i.1 > &max{
+                    max_key = **key;
+                    max = *i.1;
+                }
+            }
+            None => {}
+        }
+    }
+    max_key
 }
 // fn build_user(user:User)-> User{
 //     User{
