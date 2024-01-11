@@ -1,10 +1,7 @@
 // use std::io;
-use crate::enums::Square;
-use crate::enums::Circle;
-use crate::enums::Shape;
-use crate::enums::Number;
+mod enums;
+// use crate::enums::{Circle, Square, Number, Shape};
 
-pub mod enums;
 fn main() {
     
     let name = "Gio Gonzales";
@@ -39,16 +36,16 @@ fn main() {
     // println!("result: {}", not_quite_lisp(&my_str));
     // println!("position: {}",note_quite_lisp_2(&my_str));
     // let message = Message::ChangeColor(1,2,3);
-    let square = Square{
+    let square = enums::Square{
         sides:24
     };
-    let circle = Circle{
+    let circle = enums::Circle{
         radius:2.14
     };
-    let my_shape = Shape::Circle(circle);
+    let my_shape = enums::Shape::Circle(circle);
     match my_shape.determine_area() {
-        Number::Integer(value) => {println!("{}", value)}
-        Number::Float(value) => {println!("{}", value)}
+        enums::Number::Integer(value) => {println!("{}", value)}
+        enums::Number::Float(value) => {println!("{}", value)}
     }
     fn string_slice(s1: &str) -> &str{
         let bytes = s1.as_bytes();
