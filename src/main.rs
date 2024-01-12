@@ -1,7 +1,7 @@
-// use std::io;
+use std::io;
+use std::collections::HashMap;
 mod enums;
 // use crate::enums::{Circle, Square, Number, Shape};
-use std::collections::HashMap;
 fn main() {
     
     let name = "Gio Gonzales";
@@ -9,70 +9,38 @@ fn main() {
     let mut map = HashMap::new();
     map.insert(key, 1);
     let mutable_reference = map.entry(key).or_insert(2);
-    // println!("{}", mutable_reference);
-    //tuple struct
-    // struct Box(u32, u32);
-    // let my_box = Box(15, 17);
-    // println!("{:?}", my_box);
-    // let mut user = User{
-    //     username:String::from("g6i1o0"),
-    //     active:true,
-    //     email:String::from("gio.gonzales@carsu.edu.ph"),
-    //     sign_in_count:1
-    // };
-    // let hotdog = Dog{
-    //     name: String::from("Hotdog"),
-    //     age:2,
-    //     breed_type:String::from("Duchsand"),
-    //     color:String::from("brown"),
-    //     height:12.5,
-    //     is_alive:true
-    // };
-    // let cookie = create_dog(hotdog, String::from("Cookie"));
-    // cookie.bark();
-    // cookie.say_name();
-    // let eggsy = Dog::create_dog(String::from("Eggsy"), 3, String::from("Aspin"), String::from("black"), 5.13, true);
-    // let mut user_input  = String::new();
-    // let bytes_of_result = io::stdin().read_line(&mut user_input)
-    //            .expect("Error reading the input stream!");
-    // println!("The user input: {}", user_input);
-    // println!("Bytes: {}", bytes_of_result);
-    // let my_str = "()())";
-    // println!("result: {}", not_quite_lisp(&my_str));
-    // println!("position: {}",note_quite_lisp_2(&my_str));
-    // let message = Message::ChangeColor(1,2,3);
-//     let square = enums::Square{
-//         sides:24
-//     };
-//     let circle = enums::Circle{
-//         radius:2.14
-//     };
-//     let my_shape = enums::Shape::Circle(circle);
-//     match my_shape.determine_area() {
-//         enums::Number::Integer(value) => {println!("{}", value)}
-//         enums::Number::Float(value) => {println!("{}", value)}
-//     }
-//     fn string_slice(s1: &str) -> &str{
-//         let bytes = s1.as_bytes();
-//         for (index, &character) in bytes.iter().enumerate(){
-//             if character == b' '{
-//                 return &s1[..index];
-//             }
-//         }
-//         &s1[..]
-// }
     let mut my_list = vec![120, 50, 33, 47, 75, 88, 99, 2, 1, 34, 1, 1];
-    println!("{}", find_mode(&my_list));
-    // match first_value{
-    //     Some(i) => {println!("We have a value in the index value: {}", *i);}
-    //     None  => {println!("No Value is here");}
-    // }
-    // for i in &my_vec{
-    //     println!("{}", *i);
-    // }
-    // my_vec.push(3);
-    // println!("{}", *first_value);
-
+    let mut employee_department_map: HashMap<String, Vec<String>> = HashMap::new();
+    loop{
+        let mut choice = String::new();
+        println!("Welcome to Department Employee Structure");
+        println!("1.Add employee to the department");
+        println!("2.Check employee of the department");
+        println!("3. Exit");
+        io::stdin().read_line(&mut choice).expect("There is an error");
+        let choice: Result<u8, _> = choice.trim().parse();
+        match choice{
+            Ok(result) => {
+                if result == 1{
+                    let mut department = String::new();
+                    let mut employee = String::new();
+                    println!("Enter the deparment you want the employee to be added");
+                    io::stdin().read_line(&mut department).expect("Error reading the stdin input");
+                    println!("Enter the employee name you want to add to the inputted department");
+                    io::stdin().read_line(&mut employee).expect("Error reading the stdin input");
+                    add_employee(department, &mut employee_department_map, employee);
+                }else if result == 2 {
+                    read_map(&employee_department_map);
+                }else{
+                    break;
+                }
+        
+            }
+            Err(e) => {
+                println!("Error");
+            }
+        }
+    }
 }
 fn read_vector(slice: &[usize]){
     for i in slice{
@@ -126,61 +94,14 @@ fn find_mode(my_list: &Vec<i32>)-> i32{
     }
     max_key
 }
-// fn build_user(user:User)-> User{
-//     User{
-//         email:String::from("test@gmail.com"),
-//         ..user
-//     }
-// }
-// fn steal_struct(user: User){
-//     println!("{:?}", user);
-// }
-// fn test_number(num:u32){
-//     println!("{num}");
-// }
-// fn create_dog(origin_dog: Dog, name: String) -> Dog{
-//     Dog{
-//         name,
-//         breed_type:String::from("Duchsand"),
-//         color:String::from("brown"),
-//         ..origin_dog
-//     }
-// }
-// fn not_quite_lisp(my_string: &str) -> i64{
-//     let mut result: i64 = 0;
-//     let increment_floor = '(';
-//     let decrement_floor = ')';
-//     for c in my_string.chars(){
-//         if c == increment_floor{
-//             result+=1;
-//         }else if c == decrement_floor{
-//             result-=1;
-//         }
-//     }
-//     result
-// }
-// fn note_quite_lisp_2(pattern: &str) -> u64{
-//     let mut position: u64 = 0;
-//     let mut result: i64 = 0;
-//     let increment_floor = '(';
-//     let decrement_floor = ')';
-//     for c in pattern.chars(){
-//         position+=1;
-//         if c == increment_floor{
-//             result+=1;
-//         }else if c == decrement_floor{
-//             result-=1;
-//         }
-//         if result == -1{
-//             return position;
-//         }
-//     }
-//     position
-// }
-// fn match_practice(shape: &Shape){
-//     match shape{
-//         Shape:Square(Square) => {
-//             let area = 
-//         }
-//     }
-// }
+fn add_employee(department: String, map: &mut HashMap<String, Vec<String>>, employee: String){
+    let department = department.trim().to_string();
+    let employee = employee.trim().to_string();
+    let list = map.entry(department).or_insert(vec![]);
+    list.push(employee);
+}
+fn read_map(map: &HashMap<String, Vec<String>>){
+    for list in map{
+        println!("{:?}", list);
+    }
+}
