@@ -1,107 +1,49 @@
-use std::io;
+use std::io::{self, Read};
+use std::fs::File;
 use std::collections::HashMap;
-mod enums;
-// use crate::enums::{Circle, Square, Number, Shape};
+use rand::Rng;
+struct Guess{
+   value:u32
+}
+struct Point <T, U>{
+    x:T,
+    y:U
+}
+impl <T, U> Point<T, U>{
+    fn x(&self) -> &T{
+        &self.x
+    }
+}
+impl Guess{
+    fn new(value:u32) -> Guess{
+        if value < 1 || value > 100{
+            panic!("Value is not between 1 and 100");
+        }
+        Guess{value}
+    }
+    fn get_value(&self) -> u32{
+        self.value
+    }
+}
 fn main() {
-    
-    let name = "Gio Gonzales";
-    let key = "one";
-    let mut map = HashMap::new();
-    map.insert(key, 1);
-    let mutable_reference = map.entry(key).or_insert(2);
-    let mut my_list = vec![120, 50, 33, 47, 75, 88, 99, 2, 1, 34, 1, 1];
-    let mut employee_department_map: HashMap<String, Vec<String>> = HashMap::new();
-    loop{
-        let mut choice = String::new();
-        println!("Welcome to Department Employee Structure");
-        println!("1.Add employee to the department");
-        println!("2.Check employee of the department");
-        println!("3. Exit");
-        io::stdin().read_line(&mut choice).expect("There is an error");
-        let choice: Result<u8, _> = choice.trim().parse();
-        match choice{
-            Ok(result) => {
-                if result == 1{
-                    let mut department = String::new();
-                    let mut employee = String::new();
-                    println!("Enter the deparment you want the employee to be added");
-                    io::stdin().read_line(&mut department).expect("Error reading the stdin input");
-                    println!("Enter the employee name you want to add to the inputted department");
-                    io::stdin().read_line(&mut employee).expect("Error reading the stdin input");
-                    add_employee(department, &mut employee_department_map, employee);
-                }else if result == 2 {
-                    read_map(&employee_department_map);
-                }else{
-                    break;
-                }
-        
-            }
-            Err(e) => {
-                println!("Error");
-            }
-        }
-    }
+    let mut point_generic = Point{x:vec![1,2,3,4], y:1};
+    let generic_field = point_generic.x();
+    println!("{:?}", point_generic.x);
+    // println!("{}", );
+    let secret_number = rand::thread_rng().gen_range(1..=100);
+    println!("{secret_number}");
+    println!("Welcome to our guessing game program!");
+    println!("Enter a guess between 1-100");
+    let mut guess = String::new();
+    io::stdin().read_line(&mut guess).expect("Error reading the stdin");
+    let guess:u32 = guess.trim().parse().expect("Error parsing value");
+    let guess_struct = Guess::new(guess);
+
+
 }
-fn read_vector(slice: &[usize]){
-    for i in slice{
-        println!("{i}");
-    }
-}
-fn find_median(my_list: &mut Vec<i32>) -> i32{
-    my_list.sort();
-    let length = my_list.len();
-    println!("{length}");
-    let mut mid : usize;
-    let mut result: i32 = 0;
-    if length % 2 == 0{
-        mid = (length / 2) - 1;
-        match my_list.get(mid){
-            Some(i) => {result+=i},
-            None => {}
-        }
-        match my_list.get(mid + 1){
-            Some(i) => {result+=i},
-            None => {}
-        }
-    }else{
-        mid = length / 2;
-        println!("{mid}");
-        match my_list.get(mid){
-            Some(i) => {result+=i},
-            None => {}
-        }
-    }
-    return result;
-}
-fn find_mode(my_list: &Vec<i32>)-> i32{
-    let mut map = HashMap::new();
-    let mut max:i32 = -1;
-    let mut max_key: i32 = -1;
-    for i in my_list{
-        let count = map.entry(i).or_insert(0);
-        *count+=1;
-    }
-    for key in map.keys(){
-        match map.get_key_value(key){
-            Some(i) => {
-                if i.1 > &max{
-                    max_key = **key;
-                    max = *i.1;
-                }
-            }
-            None => {}
-        }
-    }
-    max_key
-}
-fn add_employee(department: String, map: &mut HashMap<String, Vec<String>>, employee: String){
-    let department = department.trim().to_string();
-    let employee = employee.trim().to_string();
-    let list = map.entry(department).or_insert(vec![]);
-    list.push(employee);
-}
-fn read_map(map: &HashMap<String, Vec<String>>){
-    for list in map{
-        println!("{:?}", list);
-    }
+fn read_file() -> Result<String, io::Error>{
+    let mut username_file_handle = File::open("Hello.txt")?;
+    let mut username = String::new();
+    username_file_handle.read_to_string(&mut username)?;
+    Ok(username)
 }
