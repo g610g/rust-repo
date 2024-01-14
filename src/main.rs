@@ -28,7 +28,9 @@ impl Guess{
     }
 }
 fn main() {
-    read_file("src/test.txt");    
+    let a = String::from("abcdef");
+    let c = life_times_test(&a);
+    // read_file("src/test.txt");    
 }
 fn read_file(path: &str) ->(){
     let handle = File::open(path).unwrap();
@@ -41,4 +43,15 @@ fn read_file(path: &str) ->(){
         println!("len:{}", len);
     }
     println!("{}", contents);
+}
+fn longest<'a, 'b> (a: &'a str, b :&'b str) -> &'b str{
+    if a.len() > b.len(){
+        a
+    }else{
+        b
+    }
+}
+fn life_times_test(x: &str)-> &str{
+    let b = String::from("bcd");
+    longest(x, &b)
 }
