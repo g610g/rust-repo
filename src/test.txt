@@ -1,0 +1,2 @@
+This is the test file practice reading file in rust
+This is another test
