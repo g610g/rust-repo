@@ -15,11 +15,11 @@ pub mod authentication{
         fn username(&self)->&str;
     }
     #[derive(Debug)]
-    pub struct User{
-        username:String,
+    pub struct User<'a>{
+        username:&'a String,
         password:String,
    }
-    impl Authenticatable for User{
+    impl<'a> Authenticatable for User<'a>{
         fn display_user_credentials(&self){
             println!("username: {}, password:{}", self.username, self.password);
         }
@@ -27,13 +27,21 @@ pub mod authentication{
             &self.username[..]
         }
     }
-    impl User{
-        pub fn new(username:String, password:String)->User{
+    impl<'a> User<'a>{
+        pub fn new(username: &'a String, password:String)->User{
             User{
                 username,
                 password
             }
         }
+        // pub fn check_list<'a, 'b>(&'a self, vip_users: &'b [String]) -> &'b str{
+        //     for (index, user) in vip_users.iter().enumerate(){
+        //         if (user == &self.username){
+        //             return vip_users.get(index).unwrap();
+        //         }
+        //     }
+        //     return vip_users.first().unwrap(); 
+        // }
     }
     pub fn verify_email<T: Authenticatable>(user1: &T){
     }
