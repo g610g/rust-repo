@@ -1,100 +1,36 @@
-use std::io::{self,BufReader,BufRead};
+use std::io::{self,BufReader,BufRead, Error};
 use std::fs::*;
-#[derive(Debug)]
-enum CustomResult<T>{
-    Tup(T),
-    Digit(u32),
-    Null(Option<T>)
+use std::{process};
+struct Game<'a >{
+    game_id:u32,
+    content:Vec<&'a str>
 }
-#[derive(Debug)]
-struct CustomTup<'a>{
-    text: &'a str,
-    index:usize
+fn initialize_buffer() -> Result<BufReader<File>, io::Error>{
+    let handler = File::open("assets/example.txt")?;
+    let buffer = BufReader::new(handler);
+    Ok(buffer)
 }
-fn find_first_number<'a >(vec: &Vec<&str>, line:&'a str) -> CustomResult<CustomTup<'a>>{
-    let mut min_index:u32 = 0;
-    let mut result:CustomResult<CustomTup> = CustomResult::Null(None);
-    //find the first word if there is any
-    for (num_index, num) in vec.iter().enumerate(){
-        if let Some(tup) = line.match_indices(num).collect::<Vec<(usize, &str)>>().get(0){
-            let (index, string) = tup;
-            if (min_index != 0 && *index + 1 < min_index.try_into().unwrap()) || min_index == 0{
-                min_index = *index as u32 + 1;
-                result = CustomResult::Tup(CustomTup{text:string, index:num_index});
-            }
-        }
-    }
-    if min_index == 0{
-        min_index = line.len() as u32;
-    }
-    for (char_index, character) in line.chars().enumerate(){
-        
-        if character.is_numeric() && char_index + 1 <= min_index.try_into().unwrap(){
-            min_index = char_index as u32 + 1;
-            if let Some(digit) = character.to_digit(10){
-                result = CustomResult::Digit(digit);   
-            }
-        }
-    }
-    // println!("{:?}", result);
-    result
-}
-fn find_second_number<'a >(vec: &Vec<&str>, line:&'a str) -> CustomResult<CustomTup<'a>>{
-    let mut max_index:u32 = 0;
-    let mut result:CustomResult<CustomTup> = CustomResult::Null(None);
-    //find the first word if there is any
-    for (num_index, num) in vec.iter().enumerate(){
-        if let Some(tup) = line.match_indices(num).collect::<Vec<(usize, &str)>>().last(){
-            let (index, string) = tup;
-            if *index > max_index.try_into().unwrap(){
-                max_index = *index as u32;
-                result = CustomResult::Tup(CustomTup{text:string, index:num_index});
-            }
-        }
-    }
-    for (char_index, character) in line.chars().enumerate(){
-        
-        if character.is_numeric() && char_index >= max_index.try_into().unwrap(){
-            max_index = char_index as u32;
-            if let Some(digit) = character.to_digit(10){
-                result = CustomResult::Digit(digit);   
-            }
-        }
-    }
-    // println!("{:?}", result);
-    result
+fn filter_line<'a >(line: &'a str)-> Game{
+    let sub_string:Vec<&str> = line.split(":").collect();
+    let binding = sub_string.first().expect("Error splitting the string")
+                        .split(" ").collect::<Vec<&str>>();
+    let game_id = binding.last().expect("Error accesing the element");
+    let content_vector = sub_string.last().expect("Error Accesing");
+    let content:Vec<&str> = content_vector.split(";").collect();
+    let game_id:u32 = game_id.parse::<u32>().expect("Error converting the id into u32");
+    Game{game_id, content}
 }
 fn main() {
-    let list = vec!["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]; 
-    let mut first = 0;
-    let mut second = 0;
-    let mut result = 0;
-    let handler = File::open("assets/problem.txt").expect("Error handling the file");
-    let buffer_reader = BufReader::new(handler);
-    for row in buffer_reader.lines(){
-        if let Ok(text) = row {
-            match find_first_number(&list, &text){
-                CustomResult::Tup(result) => {
-                    first = result.index as u32;
-                }
-                CustomResult::Digit(num) => {
-                    first = num;
-                }
-                other => {}
-            };
-            match find_second_number(&list, &text){
-                CustomResult::Tup(result) => {
-                    second = result.index as u32
-                }
-                CustomResult::Digit(num) => {
-                    second = num
-                }
-                other => {}
-            }            
-            let concat_string = format!("{}{}", first, second);
-            // println!("{concat_string}");
-            result+=concat_string.parse::<u32>().unwrap();
+    let mut game_list:Vec<Game> = vec![];
+    let contents = String::new();
+    let buffer = initialize_buffer().unwrap_or_else(|err|{
+        println!("Problem opening the file: {}", err);
+        process::exit(1);
+    });
+    for row in buffer.lines(){
+        if let Ok(line) = row{
+            game_list.push(filter_line(&line));
+
         }
-    }
-    println!("{result}");
+    }    
 }
