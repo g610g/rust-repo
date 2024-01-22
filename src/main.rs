@@ -8,31 +8,44 @@ struct Game{
 }
 impl Game{
     fn build_game(line: &str) -> Result<Game, Box<dyn Error>>{
-        let sub_string:Vec<&str> = line.split(":").collect();
-        let binding = sub_string.first().expect("Error splitting the string")
-                            .split(" ").collect::<Vec<&str>>();
-        let game_id = binding.last().expect("Error accesing the element");
-        let content_vector = sub_string.last().expect("Error Accesing");
-        let content:Vec<&str> = content_vector.split(";").collect();
-        let content_slice:String = content.join(";");
-        let game_id:u32 = game_id.parse::<u32>().expect("Error converting the id into u32");
-        Ok(Game{game_id, content_slice})
+        let parsed_line = line.split(":").collect::<Vec<&str>>();
+        let game_id_string = parsed_line.first().expect("Error accessing the first element");
+        let binding = game_id_string.split(" ").collect::<Vec<&str>>();
+        let number_string = binding.last().expect("Error accesing the last element");
+        let game_id = number_string.parse::<u32>().expect("Error parsing");
+        let content_slice = parsed_line.last().expect("Error accesing");
+        let content_slice_string = String::from(*content_slice);
+        Ok(Game{game_id, content_slice: content_slice_string})
     }
 }
 fn initialize_buffer() -> Result<BufReader<File>, io::Error>{
-    let handler = File::open("assets/example.txt")?;
+    let handler = File::open("assets/problem.txt")?;
     let buffer = BufReader::new(handler);
     Ok(buffer)
 }
 fn calculate_valid_games(game_list: &[Game], game_rule:&HashMap<&str, u32>) ->u32 {
-    let result:u32 = 0;
+    let mut result:u32 = 0;
+    let mut flag:bool = false;
     for game in game_list{
-        // println!("{}", game.content_slice);
-        let row:Vec<&str> = game.content_slice.split(";").collect();
-        for set in &row{
-            println!("{}", set.trim());
+        let cubes = game.content_slice.split(|c| c == ';' || c == ',').collect::<Vec<&str>>();
+        for cube in cubes{
+            let trimmed_cube = cube.trim();
+            let trimmed_cube_vec = trimmed_cube.split(" ").collect::<Vec<&str>>();
+            let key = trimmed_cube_vec.last().expect("Error");
+            let value_string  = trimmed_cube_vec.first().expect("Error");
+            let value = value_string.parse::<u32>().expect("Error parsing");
+            if let Some(hashmap_value) = game_rule.get(key){
+                if value > *hashmap_value{                    
+                    flag = false;
+                    break;
+                }   
+            }
+            flag = true;
         }
-        println!("{:?}", row);
+        if flag{
+            result+= game.game_id;
+        }
+        
     }
     result
 }
@@ -52,6 +65,6 @@ fn main() {
             game_list.push(Game::build_game(&line).expect("Error"));
         }
     }
-    calculate_valid_games(&game_list, &game_rule);
-    // println!("{:?}", game_list);
+    let result = calculate_valid_games(&game_list, &game_rule);
+    println!("{result}");
 }
