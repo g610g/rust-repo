@@ -71,3 +71,8 @@ pub mod authentication{
     }
    }
 }
+pub mod process{
+    pub struct Process{
+        
+    }
+}

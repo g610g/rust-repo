@@ -1,5 +1,5 @@
 use std::io::{self,BufReader,BufRead};
-use std::fs::*;
+use std::{fs::*, result};
 use std::{process, collections::HashMap,error::Error};
 #[derive(Debug)]
 struct Game{
@@ -31,7 +31,7 @@ fn calculate_valid_games(game_list: &[Game], game_rule:&HashMap<&str, u32>) ->u3
         for cube in cubes{
             let trimmed_cube = cube.trim();
             let trimmed_cube_vec = trimmed_cube.split(" ").collect::<Vec<&str>>();
-            let key = trimmed_cube_vec.last().expect("Error");
+            let key: &&str = trimmed_cube_vec.last().expect("Error");
             let value_string  = trimmed_cube_vec.first().expect("Error");
             let value = value_string.parse::<u32>().expect("Error parsing");
             if let Some(hashmap_value) = game_rule.get(key){
@@ -49,6 +49,38 @@ fn calculate_valid_games(game_list: &[Game], game_rule:&HashMap<&str, u32>) ->u3
     }
     result
 }
+fn calculate_power_of_set(game_list: &[Game]) -> u32{
+    let mut result:u32 = 0;
+    let mut map :HashMap<&str, u32>= HashMap::new();
+    let mut flag:bool = false;
+    for game in game_list{
+        let cubes = game.content_slice.split(|c| c == ';' || c == ',').collect::<Vec<&str>>();
+        for cube in cubes{
+            let trimmed_cube = cube.trim();
+            let trimmed_cube_vec = trimmed_cube.split(" ").collect::<Vec<&str>>();
+            let key: &&str = trimmed_cube_vec.last().expect("Error");
+            let value_string  = trimmed_cube_vec.first().expect("Error");
+            let value = value_string.parse::<u32>().expect("Error parsing");
+            let max_value = map.entry(key).or_insert(value);
+            if value > *max_value{
+                match map.insert(&key, value) {
+                    Some(inserted) => {}
+                    other => {}
+                }
+            }    
+        }
+        power_result(&mut result, &map);
+        map.clear();
+    }
+    result
+}
+fn power_result(result: &mut u32, map: &HashMap<&str, u32>)-> (){
+    let mut partial_result:u32 = 1;
+    for (key, val) in map.iter(){
+        partial_result*=(*val);
+    }
+    *result+=partial_result;
+}
 fn main() {
     let game_rule= HashMap::from([
         ("red", 12 as u32),
@@ -65,6 +97,6 @@ fn main() {
             game_list.push(Game::build_game(&line).expect("Error"));
         }
     }
-    let result = calculate_valid_games(&game_list, &game_rule);
+    let result = calculate_power_of_set(&game_list);
     println!("{result}");
 }
