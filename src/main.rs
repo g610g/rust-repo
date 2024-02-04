@@ -37,8 +37,35 @@ fn  process_waiting_turn(processes: &mut Vec<Process>){
         p.assign_waiting_turn(wait_time);
         wait_time += p.burst_time;
     });
-
     processes.iter().for_each(|p| println!("{:?}", p));
+}
+fn process_short_job_first(processes: &mut Vec<Process>){
+    let mut wait_time = 0;
+    processes.sort_by_key(|p| p.burst_time);
+    processes.iter_mut().for_each(|p|{
+        p.assign_waiting_turn(wait_time);
+        wait_time+=p.burst_time;
+    });
+}
+fn calculate_averages(processes: &Vec<Process>) -> (f32, f32){
+    let mut overall_waiting: f32 = 0.0;
+    let mut overall_turnaround: f32 = 0.0;
+    processes.iter().for_each(|p|{
+        overall_waiting+=p.wait_time as f32;
+        overall_turnaround+=p.turn_around_time as f32;
+    });
+    let overall_waiting = overall_waiting / processes.len() as f32; 
+    let overall_turnaround = overall_turnaround / processes.len() as f32;
+    (overall_waiting, overall_turnaround)
+}
+fn print_results(processes: &Vec<Process>, average_tup: (f32, f32)){
+    println!("Process\t\t\tBurst Time\t\t\tWaiting Time\t\t\tTurnaround Time");
+    processes.iter().for_each(|p| {
+        println!("P:{}\t\t\t{}\t\t\t\t\t{}\t\t\t\t\t{}", p.id, p.burst_time, p.wait_time, p.turn_around_time);
+    });
+    let (average_wait, average_turn) = average_tup;
+    println!("Average Waiting Time: {}", average_wait);
+    println!("Average Turnaround Time: {}", average_turn);
 }
 fn main() -> Result<(), Box<dyn Error>> {
     let mut process_length = String::new();
@@ -50,7 +77,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!("Error processing the program: {}", e);
         process::exit(1);
     }
-    process_waiting_turn(&mut processes);
+    process_short_job_first(&mut processes);
+    
+    print_results(&processes, calculate_averages(&processes));
     Ok(())
 
 }
