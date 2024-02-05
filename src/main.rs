@@ -1,21 +1,22 @@
-use std::{error::Error, io, process};
-use practice_package::os;
-
-
-
-fn main() -> Result<(), Box<dyn Error>> {
-    let mut process_length = String::new();
-    let mut processes:Vec<os::Process> = Vec::new();
-    println!("Enter number of processes: ");
-    io::stdin().read_line(&mut process_length)?;
-    let process_length = process_length.trim();
-    if let Err(e) = os::create_processes(process_length.parse()?, &mut processes){
-        println!("Error processing the program: {}", e);
-        process::exit(1);
+#[derive(Debug)]
+struct linkedList{
+    value:i32,
+    next: Option<Box<linkedList>>,
+}
+impl linkedList {
+    fn create_node(value:i32, next: Option<Box<linkedList>>) -> linkedList{
+        linkedList{
+            value,
+            next 
+        }
     }
-    os::process_short_job_first(&mut processes);
-    
-    os::print_results(&processes, os::calculate_averages(&processes));
-    Ok(())
+}
 
+fn insert_node(head: linkedList){
+
+}
+fn main(){
+    let next_node = Box::new(linkedList{value:1, next:None});
+    let head = linkedList::create_node(1, Some(next_node));
+    println!("{:?}", head);
 }
