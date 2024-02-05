@@ -72,4 +72,36 @@ pub mod authentication{
     }
    }
 }
+pub mod linked_list{
+    #[derive(Debug)]
+    pub struct linkedList{
+        pub value:i32,
+        pub next: Option<Box<linkedList>>,
+    }
+    impl linkedList {
+        pub fn create_node(value:i32, next: Option<Box<linkedList>>) -> Box<linkedList>{
+            Box::new(linkedList{
+                value,
+                next 
+            })
+        }
+        pub fn traverse_list(head: Option<&Box<linkedList>>)-> Result<(), &str>{
+            let mut temp = head;
+            if let None = temp{
+                return Err("Cannot traverse the list. Empty List!");
+            }
+            while let Some(node) = temp{
+                println!("{}", node.value);
+                temp = node.next.as_ref();
+            }
+            Ok(())
+        }
+        pub fn insert_node(head: &mut Option< Box<linkedList>>, node: Box<linkedList>){
+            if let None = head{
+                *head = Some(node);
+            }
+                       
+        }
+    }
+}
 
