@@ -96,11 +96,16 @@ pub mod linked_list{
             }
             Ok(())
         }
-        pub fn insert_node(head: &mut Option< Box<linkedList>>, node: Box<linkedList>){
+        pub fn insert_node_constant(mut head:Option<Box<linkedList>>, mut new_node:Box<linkedList>)-> Option<Box<linkedList>>{
             if let None = head{
-                *head = Some(node);
-            }
-                       
+                head = Some(new_node);
+                return head;
+            
+            }else if let Some(current_node) = head{
+                new_node.next = Some(current_node);
+                head = Some(new_node);
+            }; 
+            return head;
         }
     }
 }

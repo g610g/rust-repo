@@ -1,11 +1,12 @@
 use os_school::linked_list::{*};
 use std::{process};
 fn main(){
-    let node = linkedList::create_node(1, None);
-    let node1 = linkedList::create_node(2, Some(node));
-    let mut head = Some(node1);
-    if let Err(e) = linkedList::traverse_list(head.as_ref()){
-        println!("Error traversing the list: {}", e);
-        process::exit(1);
-    };
+    let mut head = None;
+    let mut new_node = linkedList::create_node(1, None);
+    head = linkedList::insert_node_constant(head, new_node);
+    head = linkedList::insert_node_constant(head, linkedList::create_node(2, None));
+    println!("{:?}", head);
+
+
+
 }
