@@ -73,6 +73,8 @@ pub mod authentication{
    }
 }
 pub mod linked_list{
+    use std::collections::LinkedList;
+
     #[derive(Debug)]
     pub struct linkedList{
         pub value:i32,
@@ -101,11 +103,24 @@ pub mod linked_list{
                 head = Some(new_node);
                 return head;
             
-            }else if let Some(current_node) = head{
-                new_node.next = Some(current_node);
-                head = Some(new_node);
-            }; 
+            }           
+            new_node.next = head;
+            head = Some(new_node);
             return head;
+        }
+        pub fn insert_end(head: Option<&mut Box<linkedList>>, new_node: Box<linkedList>)->Result<(), &str>{
+            if let None = head{
+                return Err("Cannot insert at the end while list is empty at the moment");
+            }
+            let mut tmp = head;
+            while let Some(node) = tmp {
+                if let None = node.next{
+                    node.next = Some(new_node);       
+                    break;
+                }
+                tmp = node.next.as_mut();
+            }
+            Ok(())
         }
     }
 }
