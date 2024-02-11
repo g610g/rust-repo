@@ -73,8 +73,6 @@ pub mod authentication{
    }
 }
 pub mod linked_list{
-    use std::collections::LinkedList;
-
     #[derive(Debug)]
     pub struct linkedList{
         pub value:i32,
@@ -103,7 +101,7 @@ pub mod linked_list{
                 head = Some(new_node);
                 return head;
             
-            }           
+            }
             new_node.next = head;
             head = Some(new_node);
             return head;
@@ -124,4 +122,58 @@ pub mod linked_list{
         }
     }
 }
+pub mod tree{
+    use std::collections::VecDeque;
 
+    pub struct Tree{
+        head:Option<Box<Node>>        
+    }
+    pub struct Node{
+        val: i32,
+        left: Option<Box<Node>>,
+        right:Option<Box<Node>>    
+    }
+    impl Tree {
+        pub fn new()->Tree{
+            Tree{
+                head:None
+            }
+        }
+        //node insertion using iteration and queue
+        pub fn insert(&mut self, new_node: Box<Node>){ 
+            let mut queue = VecDeque::new();
+            
+            if let None = self.head{
+                self.head = Some(new_node);
+                return;
+            }
+            let mut temp = self.head.as_mut();
+            loop {
+                if queue.is_empty(){
+                    return;
+                }
+                if let Some(node) = temp{
+                    if node.left.is_some() && node.right.is_some(){
+                        queue.push_back(node.left.as_mut());
+                        queue.push_back(node.right.as_mut());
+                    }else if node.left.is_none(){
+                        node.left = Some(new_node);
+                        return;
+                    }else if node.right.is_none(){
+                        node.right = Some(new_node);
+                        return;
+                    }
+                }
+                temp = queue.pop_front().unwrap();
+            }
+
+        }     
+    }
+    impl Node {
+        //creates a Box<Node> initial improvements to return None on fail creation
+        pub fn new(val:i32) -> Box<Node>{
+            Box::new(Node{val, left:None, right:None})
+        } 
+    }
+
+}

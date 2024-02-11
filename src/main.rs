@@ -10,8 +10,8 @@ fn main(){
         println!("Error while inserting at the end: {}", e);
         process::exit(1);
     }
-    println!("{:?}", head);
     
+    linkedList::traverse_list(head.as_ref());
 
 
 }
