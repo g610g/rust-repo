@@ -14,12 +14,9 @@ fn main(){
     
     // linkedList::traverse_list(head.as_ref());
     let mut tree = Tree::new();
-    let node  = Node::new(2);
-    tree.insert(node);
-    tree.insert(Node::new(1));
-    tree.insert(Node::new(3));
-    tree.insert(Node::new(5));
-    tree.insert(Node::new(10));
-    tree.insert(Node::new(6));
+    let node  = Node::new(20);
+    tree.bst(20);
+    tree.bst(15);
+    tree.bst(30);
     tree.inorder_traversal(tree.as_ref());
 }

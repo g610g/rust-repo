@@ -126,7 +126,7 @@ pub mod tree{
     use std::{collections::VecDeque, error::Error};
 
     pub struct Tree{
-        head:Option<Box<Node>>        
+        pub head:Option<Box<Node>>        
     }
     pub struct Node{
         val: i32,
@@ -168,6 +168,23 @@ pub mod tree{
                 }
             }
         }
+        pub fn insert_bst(&self, root: Option<Box<Node>>, new_node:Box<Node>)-> Option<Box<Node>>{
+            if let None = root{
+                let new_root = Some(new_node);
+                return new_root;
+            }
+            if let Some(mut node) = root{
+                if node.val > new_node.val{
+                    node.left = self.insert_bst(node.left, new_node);
+                    return Some(node);
+                }else{
+                    node.right = self.insert_bst(node.right, new_node);
+                    return Some(node);
+                }
+            }
+            return root;
+             
+        }
         pub fn inorder_traversal(&self, root: Option<&Box<Node>>){
             if let None = root{
                 // println!("IS none");
@@ -182,6 +199,12 @@ pub mod tree{
         //returns head as Option<&Box<Node>>
         pub fn as_ref(&self) -> Option<&Box<Node>>{
             self.head.as_ref()
+        }
+        //the api provided for inserting as a bst
+        //calls the inner helper function insert_bst
+        pub fn bst(&mut self, val:i32){
+            let head = self.head.take();
+            self.head = self.insert_bst(head, Node::new(val));
         }
 
 
