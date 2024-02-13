@@ -123,7 +123,7 @@ pub mod linked_list{
     }
 }
 pub mod tree{
-    use std::collections::VecDeque;
+    use std::{collections::VecDeque, error::Error};
 
     pub struct Tree{
         head:Option<Box<Node>>        
@@ -147,12 +147,14 @@ pub mod tree{
                 self.head = Some(new_node);
                 return;
             }
-            let mut temp = self.head.as_mut();
+            let mut temp: Option<&mut Box<Node>> = self.head.as_mut();
+            queue.push_back(temp);
             loop {
-                if queue.is_empty(){
+               if queue.is_empty(){
                     return;
                 }
-                if let Some(node) = temp{
+                
+                if let Some(node) = queue.pop_front().unwrap(){
                     if node.left.is_some() && node.right.is_some(){
                         queue.push_back(node.left.as_mut());
                         queue.push_back(node.right.as_mut());
@@ -164,10 +166,32 @@ pub mod tree{
                         return;
                     }
                 }
-                temp = queue.pop_front().unwrap();
             }
+        }
+        pub fn inorder_traversal(&self, root: Option<&Box<Node>>){
+            if let None = root{
+                // println!("IS none");
+                return;
+            }
+            if let Some(node) =  root {
+                self.inorder_traversal(node.left.as_ref());
+                println!("Node: {}", node.val);
+                self.inorder_traversal(node.right.as_ref());
+            }
+        }
+        //returns head as Option<&Box<Node>>
+        pub fn as_ref(&self) -> Option<&Box<Node>>{
+            self.head.as_ref()
+        }
 
-        }     
+
+    }
+    impl Node{
+        // pub fn inorder_traversal(&self){
+        //     if let None = self{
+
+        //     }     
+        // }
     }
     impl Node {
         //creates a Box<Node> initial improvements to return None on fail creation
@@ -175,5 +199,31 @@ pub mod tree{
             Box::new(Node{val, left:None, right:None})
         } 
     }
+    // pub struct RopeTree<'a >{
+    //     root:Option<Box<NodeTree<'a >>>
 
+    // }
+    // impl RopeTree {      
+        
+    // }
+    // pub struct NodeTree<'a>{
+    //     string:&'a str,
+    //     weight:i32,
+
+    // }
+    
 }
+pub  mod string_manipulation{
+    pub struct LeafNode<'a >{
+        string:&'a str,
+        weight:usize
+
+    }
+    //string node as leaf node
+    impl<'a > LeafNode<'a> {
+        pub fn new(string :&str) -> LeafNode{
+           LeafNode{string, weight:string.len()} 
+        }
+    }    
+}
+
