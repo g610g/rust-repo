@@ -17,6 +17,11 @@ fn main(){
     let node  = Node::new(20);
     tree.bst(20);
     tree.bst(15);
+    tree.bst(16);
     tree.bst(30);
+    tree.bst(14);
+    tree.bst(13);
+    tree.bst(12);
+    tree.bst(11);
     tree.inorder_traversal(tree.as_ref());
 }

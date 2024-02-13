@@ -206,7 +206,22 @@ pub mod tree{
             let head = self.head.take();
             self.head = self.insert_bst(head, Node::new(val));
         }
-
+        pub fn right_rotate(mut root:Box<Node>)->Option<Box<Node>>{
+            //y as the new root of the rotation
+            let mut y = root.left.unwrap();
+            //rotation
+            root.left = y.right;
+            y.right = Some(root);
+            Some(y)
+        }
+        pub fn left_rotate(mut root: Box<Node>) -> Option<Box<Node>>{
+            //x as the new root of the rotation
+            let mut x = root.right.unwrap();
+            //rotation
+            root.right = x.left;
+            x.left = Some(root);
+            Some(x)
+        }
 
     }
     impl Node{
