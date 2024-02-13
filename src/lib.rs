@@ -222,6 +222,39 @@ pub mod tree{
             x.left = Some(root);
             Some(x)
         }
+        pub fn check_balance(root: Option<Box<Node>>)-> (i32, i32, Option<Box<Node>>){
+            if root.is_none(){
+                return (0, 0, None);
+            }
+            let mut node = root.unwrap();
+            let (left_height, left_sum, left_node) = Tree::check_balance(node.left);
+            node.left = left_node;
+            let (right_height, right_sum, right_node) = Tree::check_balance(node.right);
+            node.right = right_node;
+            let height = left_height - right_height;
+            //left left
+            if height > 1 && left_sum > 1{
+                node = Tree::right_rotate(node);
+                return (height,left_sum, node);
+            }//left right 
+            else if height > 1 && left_sum < 0{
+                node.left = Tree::left_rotate(node.left.take().unwrap());
+                node = Tree::right_rotate(node);
+                return (height, left_sum, Some(node));
+            }//right left
+            else if height < 0 &&  right_sum > 1{
+                node.right = Tree::right_rotate(node.right);
+                node = Tree::left_rotate(node);
+                return (height, left_sum, Some(node));
+            }//right right
+            else if height < 0 && right_sum < 0{
+                node = Tree::left_rotate(node);
+                return (height, right_sum, Some(node));
+            }else{
+                return (height, left_sum, None);
+            }
+
+        }
 
     }
     impl Node{

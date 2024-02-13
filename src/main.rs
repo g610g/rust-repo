@@ -16,12 +16,11 @@ fn main(){
     let mut tree = Tree::new();
     let node  = Node::new(20);
     tree.bst(20);
-    tree.bst(15);
-    tree.bst(16);
     tree.bst(30);
-    tree.bst(14);
-    tree.bst(13);
-    tree.bst(12);
+    tree.bst(10);
+    tree.bst(5);
     tree.bst(11);
+    tree.head = Tree::right_rotate(tree.head.unwrap());
+    tree.head = Tree::left_rotate(tree.head.unwrap());
     tree.inorder_traversal(tree.as_ref());
 }
