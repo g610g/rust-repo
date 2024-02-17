@@ -124,10 +124,11 @@ pub mod linked_list{
 }
 pub mod tree{
     use std::{collections::VecDeque, error::Error};
-
+    #[derive(Debug)]
     pub struct Tree{
         pub head:Option<Box<Node>>        
     }
+    #[derive(Debug)]
     pub struct Node{
         val: i32,
         left: Option<Box<Node>>,
@@ -206,21 +207,26 @@ pub mod tree{
             let head = self.head.take();
             self.head = self.insert_bst(head, Node::new(val));
         }
-        pub fn right_rotate(mut root:Box<Node>)->Option<Box<Node>>{
+        pub fn right_rotate(mut root:Box<Node>)->(Option<Box<Node>>, i32){
             //y as the new root of the rotation
             let mut y = root.left.unwrap();
             //rotation
             root.left = y.right;
             y.right = Some(root);
-            Some(y)
+            let left_h = Self::give_height(y.left.as_ref());
+            let right_h = Self::give_height(y.right.as_ref());
+            (Some(y), left_h - right_h)
         }
-        pub fn left_rotate(mut root: Box<Node>) -> Option<Box<Node>>{
+        pub fn left_rotate(mut root: Box<Node>) -> (Option<Box<Node>>, i32){
             //x as the new root of the rotation
             let mut x = root.right.unwrap();
             //rotation
             root.right = x.left;
             x.left = Some(root);
-            Some(x)
+            let left_h = Self::give_height(x.left.as_ref());
+            let right_h = Self::give_height(x.right.as_ref());
+
+            (Some(x), left_h - right_h)
         }
         //used for recalculating the height after balancing
         pub fn give_height(root: Option<&Box<Node>>)->i32{
@@ -233,38 +239,51 @@ pub mod tree{
 
             return left_h.max(right_h) + 1;
         }
-        pub fn check_balance(root: Option<Box<Node>>)-> (i32, i32, Option<Box<Node>>){
+        fn prv_balance_tree(root: Option<Box<Node>>)-> (i32, i32, Option<Box<Node>>){
             if root.is_none(){
-                return (0, 0, None);
+                return (-1, 0, None);
             }
             let mut root = root.unwrap();
-            let mut new_node: Option<Box<Node>>= None; 
-            let (left_h, left_differ, left_node) = Tree::check_balance(root.left);
+            let mut new_node: Option<Box<Node>> = None; 
+            let (mut left_h, left_differ, left_node) = Self::prv_balance_tree(root.left);
             root.left = left_node;
-            let (right_h, right_differ, right_node) = Tree::check_balance(root.right);
+            let (mut right_h, right_differ, right_node) = Self::prv_balance_tree(root.right);
             root.right = right_node;
-            let height_differ = left_h - right_h;
+            let mut height_differ = left_h - right_h;
+            let mut return_height = left_h.max(right_h) + 1;
+            // println!("left height: {} right: height: {} of node with val : {} height differ: {}left differ: {}", left_h,right_h, root.val, height_differ, left_differ);
             if height_differ > 1 && left_differ >= 0{
                 //do necessary rotation for left left
-                new_node = Tree::right_rotate(root);
+                // println!("Rotate on node value: {}", root.val);
+                (new_node, height_differ) = Self::right_rotate(root);                
+                // println!("new height for node is : {}\n", return_height);
             }
             else if height_differ > 1 && left_differ <= -1{
                 //for left-right rotation
-                root.left = Tree::left_rotate(root.left.unwrap());
-                new_node = Tree::right_rotate(root);
+                (root.left, _) = Self::left_rotate(root.left.unwrap());
+                (new_node, height_differ) = Self::right_rotate(root);
+                return_height = Self::give_height(new_node.as_ref());
             }
             //right right 
             else if height_differ < -1 && right_differ <= 0{
-                new_node = Tree::left_rotate(root);
+                (new_node, height_differ) = Self::left_rotate(root);
+                return_height = Self::give_height(new_node.as_ref());
             }else if height_differ < -1 && right_differ > 0{
                 //right-left
-                root.right = Tree::right_rotate(root.right.unwrap());
-                new_node = Tree::left_rotate(root);
+                (root.right, _) = Self::right_rotate(root.right.unwrap());
+                (new_node, height_differ) = Self::left_rotate(root);
+                return_height = Self::give_height(new_node.as_ref());
+            }else{
+                return (return_height, height_differ, Some(root));
             }
-
-            return (left_h.max(right_h) + 1, height_differ, new_node);
+            return (return_height, height_differ, new_node);
             
         }
+        pub fn balance_tree(root: Option<Box<Node>>)-> Option<Box<Node>>{
+            let (_height, _differ, root) = Self::prv_balance_tree(root);
+            return root;
+        }
+
 
     }
     impl Node{

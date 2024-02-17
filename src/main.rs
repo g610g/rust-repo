@@ -15,17 +15,16 @@ fn main(){
     // linkedList::traverse_list(head.as_ref());
     let mut tree = Tree::new();
     let node  = Node::new(20);
-    tree.bst(20);
-    tree.bst(30);
     tree.bst(10);
     tree.bst(5);
     tree.bst(11);
-    tree.bst(4);
-    tree.bst(3);
-    tree.bst(2);
-    tree.bst(1);
+    tree.bst(12);
+    tree.bst(13);
+    tree.bst(14);
+    tree.bst(15);
     // tree.head = Tree::right_rotate(tree.head.unwrap());
     // tree.head = Tree::left_rotate(tree.head.unwrap());
     // tree.inorder_traversal(tree.as_ref());
+    tree.head = Tree::balance_tree(tree.head);
     println!("Height: {}", Tree::give_height(tree.head.as_ref()));
 }
