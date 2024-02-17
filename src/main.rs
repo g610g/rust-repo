@@ -20,7 +20,12 @@ fn main(){
     tree.bst(10);
     tree.bst(5);
     tree.bst(11);
-    tree.head = Tree::right_rotate(tree.head.unwrap());
-    tree.head = Tree::left_rotate(tree.head.unwrap());
-    tree.inorder_traversal(tree.as_ref());
+    tree.bst(4);
+    tree.bst(3);
+    tree.bst(2);
+    tree.bst(1);
+    // tree.head = Tree::right_rotate(tree.head.unwrap());
+    // tree.head = Tree::left_rotate(tree.head.unwrap());
+    // tree.inorder_traversal(tree.as_ref());
+    println!("Height: {}", Tree::give_height(tree.head.as_ref()));
 }

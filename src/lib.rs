@@ -223,8 +223,15 @@ pub mod tree{
             Some(x)
         }
         //used for recalculating the height after balancing
-        pub fn give_height(root: Option<&Box<Node>>){
+        pub fn give_height(root: Option<&Box<Node>>)->i32{
+            if root.is_none(){
+                return -1;
+            }
+            let root = root.unwrap();
+            let left_h = Tree::give_height(root.left.as_ref());
+            let right_h = Tree::give_height(root.right.as_ref());
 
+            return left_h.max(right_h) + 1;
         }
         pub fn check_balance(root: Option<Box<Node>>)-> (i32, i32, Option<Box<Node>>){
             if root.is_none(){
