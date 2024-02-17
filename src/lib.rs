@@ -222,38 +222,41 @@ pub mod tree{
             x.left = Some(root);
             Some(x)
         }
+        //used for recalculating the height after balancing
+        pub fn give_height(root: Option<&Box<Node>>){
+
+        }
         pub fn check_balance(root: Option<Box<Node>>)-> (i32, i32, Option<Box<Node>>){
             if root.is_none(){
                 return (0, 0, None);
             }
-            let mut node = root.unwrap();
-            let (left_height, left_sum, left_node) = Tree::check_balance(node.left);
-            node.left = left_node;
-            let (right_height, right_sum, right_node) = Tree::check_balance(node.right);
-            node.right = right_node;
-            let height = left_height - right_height;
-            //left left
-            if height > 1 && left_sum > 1{
-                node = Tree::right_rotate(node);
-                return (height,left_sum, node);
-            }//left right 
-            else if height > 1 && left_sum < 0{
-                node.left = Tree::left_rotate(node.left.take().unwrap());
-                node = Tree::right_rotate(node);
-                return (height, left_sum, Some(node));
-            }//right left
-            else if height < 0 &&  right_sum > 1{
-                node.right = Tree::right_rotate(node.right);
-                node = Tree::left_rotate(node);
-                return (height, left_sum, Some(node));
-            }//right right
-            else if height < 0 && right_sum < 0{
-                node = Tree::left_rotate(node);
-                return (height, right_sum, Some(node));
-            }else{
-                return (height, left_sum, None);
+            let mut root = root.unwrap();
+            let mut new_node: Option<Box<Node>>= None; 
+            let (left_h, left_differ, left_node) = Tree::check_balance(root.left);
+            root.left = left_node;
+            let (right_h, right_differ, right_node) = Tree::check_balance(root.right);
+            root.right = right_node;
+            let height_differ = left_h - right_h;
+            if height_differ > 1 && left_differ >= 0{
+                //do necessary rotation for left left
+                new_node = Tree::right_rotate(root);
+            }
+            else if height_differ > 1 && left_differ <= -1{
+                //for left-right rotation
+                root.left = Tree::left_rotate(root.left.unwrap());
+                new_node = Tree::right_rotate(root);
+            }
+            //right right 
+            else if height_differ < -1 && right_differ <= 0{
+                new_node = Tree::left_rotate(root);
+            }else if height_differ < -1 && right_differ > 0{
+                //right-left
+                root.right = Tree::right_rotate(root.right.unwrap());
+                new_node = Tree::left_rotate(root);
             }
 
+            return (left_h.max(right_h) + 1, height_differ, new_node);
+            
         }
 
     }
