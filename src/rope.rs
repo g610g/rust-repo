@@ -1,56 +1,96 @@
-pub struct Rope{
-    head:Option<Box<dyn TreeNode>>
+
+use crate::tree::Tree;
+#[derive(Debug)]
+pub enum TreeNode{
+    LeafNode(LeafNode),
+    WeightNode(WeightNode)
 }
-pub trait TreeNode{
-    fn length(&self) -> usize;
-}
-impl<'a> TreeNode for LeafNode<'a >{
-    fn length(&self)->usize{
-        self.length
+impl TreeNode {
+    // pub fn new_leaf(string: &str)-> Box<TreeNode>{
+    //     LeafNode::new(string)
+    // }
+    // pub fn new_weight() -> Box<TreeNode>{
+    //     WeightNode::new()
+    // }
+    fn take_leaf(self) -> LeafNode{
+        match self{
+            TreeNode::LeafNode(l) => l,
+            _ => {panic!("Error not a leafnode")}
+        }
+    }
+    pub fn take_weight(self) -> WeightNode{
+        match self{
+            TreeNode::WeightNode(w) => w,
+            _ => panic!("Error not a weightnode")
+        }
+    }
+    
+    pub fn append(&mut self, str: &str) -> Option<Box<TreeNode>>{
+        match self{
+            TreeNode::WeightNode(lf) => {
+                let leaf_node = LeafNode::new(str);
+                let mut weight_node = WeightNode::new();
+                if let TreeNode::WeightNode(w) = weight_node.as_mut(){
+                    w.left = Some(leaf_node);
+                }    
+                return Some(weight_node);
+            }, 
+            TreeNode::LeafNode(l) => panic!("Panic sa")      
+        }
     }
 }
-impl TreeNode for WeightNode{
-    fn length(&self) -> usize{
-        12
+
+#[derive(Debug)]
+pub struct LeafNode{
+    string: String,
+    length:usize,
+    start:usize
+}
+
+impl LeafNode{
+    fn new(s:&str)->Box<TreeNode>{
+        let leaf_node = TreeNode::LeafNode(LeafNode{
+            string:s.to_string(),
+            start:0,
+            length:s.len() - 1
+        });
+        Box::new(leaf_node)
     }
 
 }
-pub struct LeafNode<'a >{
-    string:&'a str,
-    length:usize
-}
-
+#[derive(Debug)]
 pub struct WeightNode{
     weight:i64,
-    left: Option<Box<dyn TreeNode>>,
-    right:Option<Box<dyn TreeNode>>
+    left: Option<Box<TreeNode>>,
+    right:Option<Box<TreeNode>>
 }
-
+impl WeightNode{
+    fn new()-> Box<TreeNode>{
+       let weight_node = TreeNode::WeightNode(WeightNode{weight:64, left:None, right:None});
+       Box::new(weight_node)
+   }
+}
+pub struct Rope{
+    root:Option<Box<TreeNode>>
+}
 impl Rope{
     pub fn new() -> Self{
         Rope{
-            head:None
+            root:None
         }
     }
-    pub fn append(&mut self, string: &'static str){
-        let leaf_node = LeafNode::new(string);
-        let mut weight_node = WeightNode::new();
-        weight_node.left = Some(leaf_node);
-        self.head = Some(weight_node);
-    } 
-}
-impl <'a > LeafNode<'a >{
-    pub fn new(string: &'a str)->Box<LeafNode>{
-        Box::new(LeafNode{
-            string,
-            length:string.len()
-        })
+    pub fn append(&mut self, string: &str){
+        match self.root.as_mut(){
+            Some(root_ref) => self.root = root_ref.append(string),
+            //mag kuan ka diria himo ka og new weight_node og leaf_node tapos ang created nga weight_node mao na ang imohang new root
+            None => panic!("Wala rason pero ga panici")
+        };
     }
-}
-impl WeightNode{
-    pub fn new()-> Box<Self>{
-        Box::new(
-            WeightNode{weight:64, left:None, right:None}
-        )
+    pub fn print_string(&mut self){
+       if let Some(head) =  self.root.as_ref(){
+        
+       };
     }
+
 }
+
