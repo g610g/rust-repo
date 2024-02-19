@@ -1,6 +1,8 @@
 use core::num;
 // use os_school::{tree::{*}, rope::{*}};
 use std::{borrow::Borrow, cell::RefCell, mem, ops::Deref, rc::Rc}; 
+use os_school::rope::Rope;
+
 use crate::List::{*};
 struct DropTest{
     string: String
@@ -45,9 +47,7 @@ impl List {
     }
 }
 fn main(){
-    let cons = List::new_cons();
-    cons.test_ref_cell();
-    cons.print_val();
+    let rope = Rope::new("hello gio").unwrap();
     // let text_string = "This is a string test only!";
     // let mut rope = Rope::new();
     // rope.append(text_string);
