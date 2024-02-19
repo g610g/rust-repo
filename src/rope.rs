@@ -1,4 +1,6 @@
 
+use std::mem;
+
 use crate::tree::Tree;
 #[derive(Debug)]
 pub enum TreeNode{
@@ -26,17 +28,21 @@ impl TreeNode {
     }
     
     pub fn append(&mut self, str: &str) -> Option<Box<TreeNode>>{
-        match self{
-            TreeNode::WeightNode(lf) => {
-                let leaf_node = LeafNode::new(str);
-                let mut weight_node = WeightNode::new();
-                if let TreeNode::WeightNode(w) = weight_node.as_mut(){
-                    w.left = Some(leaf_node);
-                }    
-                return Some(weight_node);
-            }, 
-            TreeNode::LeafNode(l) => panic!("Panic sa")      
+        let mut weight = self.take_weight();
+        if weight.right.is_none(){
+            let leaf_node = LeafNode::new(str);
+            weight.right = Some(leaf_node);
+            let mut weight_node = WeightNode::new();
+            if let TreeNode::WeightNode(w) = weight_node.as_mut(){
+                w.left = Some(Box::new(TreeNode::WeightNode(weight)));
+            }
+            return Some(weight_node);
         }
+        let leaf_node = LeafNode::new(str);
+        
+    }
+    pub fn read_rope(&self){
+        
     }
 }
 
@@ -86,11 +92,11 @@ impl Rope{
             None => panic!("Wala rason pero ga panici")
         };
     }
-    pub fn print_string(&mut self){
-       if let Some(head) =  self.root.as_ref(){
+    // pub fn print_string(&mut self){
+    //    if let Some(head) =  self.root.as_ref(){
         
-       };
-    }
+    //    };
+    // }
 
 }
 
