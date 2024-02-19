@@ -47,7 +47,9 @@ impl List {
     }
 }
 fn main(){
-    let rope = Rope::new("hello gio").unwrap();
+    let mut rope = Rope::new("hello gio").unwrap();
+    rope = rope.append("string").unwrap();
+    
     // let text_string = "This is a string test only!";
     // let mut rope = Rope::new();
     // rope.append(text_string);

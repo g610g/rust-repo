@@ -1,18 +1,4 @@
-use std::{error::Error as StdError, fmt::Display};
-
 use super::rope::Rope::{*};
-#[derive(Debug)]
-struct Error{
-    message: String
-}
-impl Display for Error{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.message)
-    }
-}
-impl StdError for Error {
-    
-}
 #[derive(Debug)]
 pub struct LeafNode{
     string: String,
@@ -52,23 +38,47 @@ impl Rope{
             LeafNode(LeafNode::new(str))
         ))
     }
-    fn new_weight_node(weight:usize) -> Option<Box<Rope>>{
+    fn new_weight_node(weight_node: WeightNode) -> Option<Box<Rope>>{
         Some(
             Box::new(
-                WeightNode(WeightNode::new(weight))
+                WeightNode(weight_node)
             )
         )
     }
-    pub fn new(string: &str) -> Result<Option<Box<Rope>>, &str>{
+    pub fn new(string: &str) -> Result<Rope, &str>{
         let leaf_node = Self::new_leaf_node(string);
-        if let Some(ln) = leaf_node{
-            if let LeafNode(leaf) = *ln{
-                let weight_node = Self::new_weight_node(leaf.length);
-                return Ok(weight_node);
-            }
-           
+        if leaf_node.is_some(){
+            //creates the struct weightNode as mutable
+            let mut w = WeightNode::new(string.len());
+            //assign the weight_node to the newly leaf_node
+            w.left = leaf_node;
+            //wrap enum weight_node the struct weight_node
+            let weight_node = WeightNode(w);
+            return Ok(weight_node);
         }
-        return Err("error creating rope");
+        Err("error creating rope")
+    }
+    pub fn append(self, string: &str)-> Result<Rope, &str>{
+        match self{
+            WeightNode(mut w) => {
+                let new_ln = Self::new_leaf_node(string);
+                w.right = new_ln;
+                let mut new_w = WeightNode::new(w.weight + string.len());
+                new_w.left = Self::new_weight_node(w);
+                //rebalance should be made here
+                return Ok(WeightNode(new_w).balance()); 
+            }
+            _ => {Err("Error appending a string")}
+        }
+    }
+    fn balance(self) -> Rope{
+        // match self {
+        //     WeightNode(w) => {
+
+        //     },
+        //     _ => {}
+        // }
+        return self;
     }
 
 }
