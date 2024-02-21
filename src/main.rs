@@ -51,6 +51,7 @@ fn main(){
     rope = rope.append("string").unwrap();
     rope = rope.append("2").unwrap();
     rope.helper_inorder();
+    println!("{}", rope.get_height());
     // let text_string = "This is a string test only!";
     // let mut rope = Rope::new();
     // rope.append(text_string);

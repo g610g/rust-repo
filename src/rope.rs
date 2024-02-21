@@ -33,6 +33,17 @@ impl WeightNode{
             right:None
         }
     }
+    fn rotate_right(mut self){
+        let mut y = self.left.unwrap();
+        
+        match y.as_mut(){
+            WeightNode(w) => {
+                self.left = w.right;
+                // w.right = Rope::new_weight_node(self);
+            },
+            _ => {}
+        }
+    }
 }
 pub enum Rope{
     LeafNode(LeafNode),
@@ -89,17 +100,9 @@ impl Rope{
             _ => {Err("Error appending a string")}
         }
     }
-    fn print_weight(&self){
-        match self{
-            WeightNode(w) => {
-                println!("{}", w.weight);
-            }
-            _ => {panic!("Error")}
-        }
-    }
     pub fn get_height(&mut self) -> i32{
         if self.is_leaf(){
-            return 1;
+            return 0;
         }
         if let WeightNode(w)  = self{
             let mut  left_height = 0;
@@ -134,17 +137,42 @@ impl Rope{
         }
 
     }
-    // fn balance(&mut self) -> Rope{
-    //     if self.is_leaf(){
+    
+       fn balance(self) -> Rope{
+        if self.is_leaf(){
+            panic!("Cannot balance or rotate leaf node!");
+        }
+        let root = match self{
+            WeightNode(w) => {
+                let mut left_height = 0;
+                let mut right_height = 0;
+                if let Some(left) = w.left.as_mut(){
+                   left_height = left.get_height();
 
-    //     }
-    //     match self {
-    //         WeightNode(mut w) => {
+                }
+                if let Some(right) = w.right.as_mut(){
+                    right_height = right.get_height();
+                }
+                if left_height - right_height > 1 || left_height - right_height < -1{
+                    //rotate to the right nato ang atoang root having a new root
+                                        
+                }
 
-    //         },
-    //         _ => {}
+            },
+            _ => {panic!("Leaf node ni")}
+        }
+        return w;
+
+        // return self;
+    }
+
+        // fn print_weight(&self){
+    //     match self{
+    //         WeightNode(w) => {
+    //             println!("{}", w.weight);
+    //         }
+    //         _ => {panic!("Error")}
     //     }
-    //     // return self;
     // }
 
 }
