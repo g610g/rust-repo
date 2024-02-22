@@ -1,5 +1,6 @@
 use core::panic;
 
+
 use rand::distributions::weighted::alias_method::Weight;
 
 use super::rope::Rope::{*};
@@ -33,16 +34,17 @@ impl WeightNode{
             right:None
         }
     }
-    fn rotate_right(mut self){
-        let mut y = self.left.unwrap();
-        
-        match y.as_mut(){
-            WeightNode(w) => {
-                self.left = w.right;
-                // w.right = Rope::new_weight_node(self);
-            },
-            _ => {}
+    //rotates left side which is your self
+    fn rotate_right(mut self) -> Option<Box<Rope>>{
+        //self is a weight struct
+        let mut new_root = self.left.unwrap();   
+        let mut w = new_root.return_weight_struct();
+        if let Some(right) = w.right.as_mut(){
+            self.weight =  right.get_weight();
         }
+        self.left = w.right;
+        w.right = Rope::new_weight_node(self);
+        return Rope::new_weight_node(w);
     }
 }
 pub enum Rope{
@@ -59,6 +61,20 @@ impl Rope{
         match self {
             LeafNode(lf) => true,
             WeightNode(w) => false
+        }
+    }
+    fn get_weight(&self) -> usize{
+        if let WeightNode(w) = self{
+            return w.weight;
+        }
+        return 0;
+    }
+    fn return_weight_struct(self) -> WeightNode{
+        match self {
+            WeightNode(w) => {
+               return  w; 
+            }
+            _ => {panic!("Not an weight node")}
         }
     }
     fn is_weight(&self) -> bool{
@@ -93,9 +109,10 @@ impl Rope{
                 let new_ln = Self::new_leaf_node(string);
                 w.right = new_ln;
                 let mut new_w = WeightNode::new(w.weight + string.len(), w.height + 1);
-                new_w.left = Self::new_weight_node(w);
+               new_w.left =  WeightNode(w).balance();
                 //rebalance should be made here
-                return Ok(WeightNode(new_w)); 
+                //also change the weight of the new_w since after balancing weights will be adjusted
+                return Ok(WeightNode(new_w));
             }
             _ => {Err("Error appending a string")}
         }
@@ -138,12 +155,12 @@ impl Rope{
 
     }
     
-       fn balance(self) -> Rope{
+       fn balance(self) -> Option<Box<Rope>>{
         if self.is_leaf(){
             panic!("Cannot balance or rotate leaf node!");
         }
-        let root = match self{
-            WeightNode(w) => {
+        match self{
+            WeightNode(mut w) => {
                 let mut left_height = 0;
                 let mut right_height = 0;
                 if let Some(left) = w.left.as_mut(){
@@ -154,15 +171,18 @@ impl Rope{
                     right_height = right.get_height();
                 }
                 if left_height - right_height > 1 || left_height - right_height < -1{
-                    //rotate to the right nato ang atoang root having a new root
-                                        
+                                    
+                    //you have to find a way to extract the weight struct and rotate it to the left and will return a Rope num
+                    return w.rotate_right();
+                }else{
+                    return Rope::new_weight_node(w);
                 }
-
+                
             },
             _ => {panic!("Leaf node ni")}
-        }
-        return w;
-
+        };
+        
+     
         // return self;
     }
 
