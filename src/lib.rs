@@ -1,4 +1,3 @@
-pub mod rope;
 pub mod tree;
 pub mod linked_list{
     #[derive(Debug)]

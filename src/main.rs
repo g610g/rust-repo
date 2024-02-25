@@ -1,7 +1,6 @@
 use core::num;
 // use os_school::{tree::{*}, rope::{*}};
 use std::{borrow::Borrow, cell::RefCell, mem, ops::Deref, rc::Rc}; 
-use os_school::rope::Rope;
 
 use crate::List::{*};
 struct DropTest{
@@ -47,11 +46,7 @@ impl List {
     }
 }
 fn main(){
-    let mut rope = Rope::new("hello gio").unwrap();
-    rope = rope.append("string").unwrap();
-    rope = rope.append("2").unwrap();
-    rope.helper_inorder();
-    println!("{}", rope.get_height());
+   
     // let text_string = "This is a string test only!";
     // let mut rope = Rope::new();
     // rope.append(text_string);
