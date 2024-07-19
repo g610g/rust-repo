@@ -1,8 +1,4 @@
-use std::{
-    env,
-    fs::File,
-    io::{self, Read},
-};
+use std::{env, fs::File, io::Read};
 
 #[derive(Debug)]
 enum Args {
@@ -15,8 +11,12 @@ enum Args {
 struct WC {
     args: Vec<Args>,
     buffer: String,
+    file_handler: File,
     file_name: String,
 }
+// impl Args{
+//
+// }
 impl WC {
     fn initialize() -> Result<Self, &'static str> {
         let mut args_iter = env::args();
@@ -40,19 +40,13 @@ impl WC {
                 }
             })
             .collect();
-        let (mut buffer, bytes_read) = read_from_stdin();
-
-        if bytes_read != 0 {
-            return Ok(WC {
-                args,
-                file_name,
-                buffer,
-            });
-        }
+        //we already read the file and also fill in our buffer
         let mut file_handler = File::open(&file_name).unwrap();
+        let mut buffer = String::new();
         let _ = file_handler.read_to_string(&mut buffer);
         Ok(WC {
             args,
+            file_handler,
             file_name,
             buffer,
         })
@@ -66,7 +60,7 @@ impl WC {
                 Args::ReadBytes => self.count_bytes(),
                 Args::ReadLines => self.count_lines(),
                 Args::ReadWords => self.count_words(),
-                Args::ReadChars => self.count_chars(),
+                Args::ReadChars => self.read_chars(),
                 _ => self.count_lines().count_words().count_bytes(),
             };
         });
@@ -98,11 +92,6 @@ impl WC {
         println!("{} {}", chars, self.file_name);
         self
     }
-}
-fn read_from_stdin() -> (String, usize) {
-    let mut buffer = String::new();
-    let bytes_read = io::stdin().read_to_string(&mut buffer).unwrap();
-    (buffer, bytes_read)
 }
 
 fn main() {
