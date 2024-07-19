@@ -1,4 +1,8 @@
-use std::{env, fs};
+use std::{
+    env,
+    fs::{self, File},
+    io::Read,
+};
 
 #[derive(Debug)]
 enum Args {
@@ -43,10 +47,8 @@ impl WC {
             //execute all shit
         }
         self.args.iter().for_each(|item| match item {
-            Args::ReadBytes => {
-                self.count_bytes();
-            }
-            Args::ReadLines => {}
+            Args::ReadBytes => self.count_bytes(),
+            Args::ReadLines => self.count_lines(),
             Args::ReadWords => {}
             Args::Input(_) => {}
         });
@@ -54,6 +56,13 @@ impl WC {
     fn count_bytes(&self) {
         let bytes_count = fs::read(&self.file_name).unwrap();
         println!("{} {}", bytes_count.len(), self.file_name);
+    }
+    fn count_lines(&self) {
+        let mut buffer = String::new();
+        let mut file = File::open(&self.file_name).unwrap();
+        file.read_to_string(&mut buffer).unwrap();
+        let lines_count = buffer.lines().collect::<Vec<_>>().len();
+        println!("{} {}", lines_count, self.file_name);
     }
 }
 
