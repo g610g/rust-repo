@@ -1,6 +1,7 @@
 use std::{
     env,
-    fs::File,
+    error::Error,
+    fs::{self, File},
     io::{self, Read},
 };
 
@@ -18,14 +19,21 @@ struct WC {
     file_name: String,
 }
 impl WC {
-    fn initialize() -> Result<Self, &'static str> {
+    fn initialize() -> Result<Self, Box<dyn Error>> {
         let mut args_iter = env::args();
         if args_iter.len() < 2 {
-            return Err("Invalid number of arguments");
+            return Err("Invalid number of arguments".into());
         }
         args_iter.next().unwrap_or_else(|| {
             panic!("Something went wrong");
         });
+        match args_iter.next() {
+            Some(_) => {}
+            None => {
+                return Err("Something went wrong".into());
+            }
+        }
+
         let mut file_name = String::new();
         let args = args_iter
             .map(|e| match e.as_str() {
@@ -41,7 +49,6 @@ impl WC {
             })
             .collect();
         let (mut buffer, bytes_read) = read_from_stdin();
-
         if bytes_read != 0 {
             return Ok(WC {
                 args,
@@ -49,7 +56,8 @@ impl WC {
                 buffer,
             });
         }
-        let mut file_handler = File::open(&file_name).unwrap();
+        let mut file_handler = File::open(&file_name)?;
+
         let _ = file_handler.read_to_string(&mut buffer);
         Ok(WC {
             args,
@@ -106,6 +114,12 @@ fn read_from_stdin() -> (String, usize) {
 }
 
 fn main() {
-    let wc = WC::initialize().unwrap();
+    let wc = match WC::initialize() {
+        Ok(wc) => wc,
+        Err(e) => {
+            eprintln!("{e}");
+            std::process::exit(1);
+        }
+    };
     wc.execute();
 }
