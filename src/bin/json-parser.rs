@@ -1,3 +1,8 @@
+use std::{
+    fs::{self, File},
+    io::{BufReader, Read},
+};
+
 enum Token {
     LCurly,
     RCurly,
@@ -16,16 +21,34 @@ enum ValueTok {
 }
 impl Token {}
 struct Lexer {
-    input: String,
+    input_str: String,
+    tokens: Vec<Token>,
+}
+impl Lexer {
+    //this must be a json extension
+    fn init(json_path: &str) -> Self {
+        let file = File::open(json_path).unwrap();
+        let mut reader = BufReader::new(file);
+        let mut input_str = String::new();
+        let _ = reader.read_to_string(&mut input_str);
+        Self {
+            input_str,
+            tokens: vec![],
+        }
+    }
+    fn walk_input(&self) {
+        self.input_str.chars().for_each(|v| {
+            println!("char:{v}");
+        });
+    }
+    //should we remove white spaces of our input right here?
+    // fn clean_input(&mut self) {
+    //     self.input_str.
+    // }
 }
 fn main() {
-    let _tokens: Vec<Token> = vec![];
-    //a character but the datatype of the variable is u8 or bytes
-    let my_str = "Здравствуйте".to_string();
-    my_str.chars().enumerate().for_each(|(idx, v)| {
-        println!("value:{v}, idx:{idx}");
-    });
-    println!("Len of our string is: {}", my_str.len());
+    let lex = Lexer::init("assets/test.json");
+    lex.walk_input();
 }
 
 //todos:
