@@ -10,6 +10,7 @@ enum Token {
     Colon,
     Key(String),
     Value(ValueTok),
+    EOF,
 }
 enum ValueTok {
     Array,
@@ -23,6 +24,7 @@ impl Token {}
 struct Lexer {
     input_str: String,
     tokens: Vec<Token>,
+    position: usize,
 }
 impl Lexer {
     //this must be a json extension
@@ -34,6 +36,7 @@ impl Lexer {
         Self {
             input_str,
             tokens: vec![],
+            position: 0,
         }
     }
     fn walk_input(&self) {
@@ -41,10 +44,8 @@ impl Lexer {
             println!("char:{v}");
         });
     }
-    //should we remove white spaces of our input right here?
-    // fn clean_input(&mut self) {
-    //     self.input_str.
-    // }
+
+    fn get_next_token(&mut self) {}
 }
 fn main() {
     let lex = Lexer::init("assets/test.json");
@@ -52,5 +53,6 @@ fn main() {
 }
 
 //todos:
-//#define grammar for the language
-//#impliment the lexical phase or tokenization of the input string
+//define grammar for the language
+//impliment the lexical phase or tokenization of the input string
+//fsm instead of using regex?
