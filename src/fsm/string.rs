@@ -1,19 +1,23 @@
-struct StringFSM {
+use crate::lexer::{Lexer, Token};
+
+pub struct StringFSM {
     current_state: State,
-    initial_state: State,
-    final_state: State,
 }
 impl StringFSM {
     pub fn init() -> Self {
         StringFSM {
             current_state: State::StartState,
-            initial_state: State::StartState,
-            final_state: State::FinalState,
         }
     }
-    pub fn run(&mut self, item: u8) -> Result<(), &str> {
-        let mut transition: Transition = Transition::create_transition(item);
-        while let State::DeadendState = self.current_state.transition(input, transition) {}
+
+    //returns Result if error occured during running state machine
+    pub fn generate_token(&mut self, lexer: &mut Lexer) -> Result<Token, &str> {
+        let transition: Transition = Transition::create_transition(lexer.ch);
+
+        while let Ok(state) = self.current_state.transition(&transition) {
+            self.current_state = state;
+        }
+        return Ok(Token::Key);
     }
 }
 enum State {
@@ -26,7 +30,7 @@ enum State {
 }
 
 impl State {
-    pub fn transition(self, input: Transition) -> Result<State, &str> {
+    pub fn transition(&self, input: &Transition) -> Result<State, &str> {
         match (self, input) {
             (Self::StartState, Transition::Quote) => Ok(Self::StartQuote),
             (Self::StartState, _) => Err("State transition error"),
@@ -47,6 +51,7 @@ enum Transition {
     Quote,
 }
 impl Transition {
+    //brb
     pub fn create_transition(item: u8) -> Self {
         if item.is_ascii_alphabetic() {
             Self::Alphabet
