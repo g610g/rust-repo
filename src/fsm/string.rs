@@ -1,51 +1,72 @@
-use crate::lexer::{Lexeme, Lexer, Token};
+use core::str;
+
+use crate::lexer::{Lexeme, Token};
 
 pub struct StringFSM {
     current_state: State,
     chars: Vec<u8>,
-    chars_length: usize,
+    current_lexeme_ch: u8,
 }
 impl StringFSM {
     pub fn init(chars: Vec<u8>) -> Self {
         StringFSM {
             current_state: State::StartState,
-            chars_length: chars.len(),
+            current_lexeme_ch: chars[0],
             chars,
         }
     }
+    fn give_current_state(&self) -> &State {
+        &self.current_state
+    }
 
-    //I should return the Token with a lexem
-    pub fn generate_token(&mut self, lexer: &mut Lexer) -> Result<Token, &str> {
-        let transition: Transition = Transition::create_transition(lexer.ch);
-
-        while let Ok(state) = self.current_state.transition(&transition) {
-            self.current_state = state;
+    //returns a token variant on success. Otherwise, err
+    pub fn generate_token(&mut self) -> Result<Token, &str> {
+        for ch in self.chars.clone() {
+            let transition = Transition::create_transition(ch);
+            match self.current_state.transition(&transition) {
+                Ok(state) => {
+                    self.current_state = state;
+                }
+                Err(_) => {
+                    return Err("We have an error during creating token with the given lexeme")
+                }
+            }
         }
-        let lexeme = Lexeme::create_lexeme(String::new(), 2);
-        return Ok(Token::Key(lexeme));
+
+        match self.current_state {
+            State::AcceptState => {
+                //we should only create a lexeme if this is okay
+                let lexeme_string = str::from_utf8(&self.chars).unwrap();
+                let lexeme = Lexeme::create_lexeme(lexeme_string.to_string(), 21);
+                return Ok(Token::Key(lexeme));
+            }
+            _ => {
+                return Err("Cannot create token based on the given lexeme");
+            }
+        }
     }
 }
+#[derive(Debug)]
 enum State {
     StartState,
-    FinalState,
-    StartQuote,
-    EndQuote,
-    AsciiChar,
-    DeadendState,
+    SecondState,
+    ThirdState,
+    AcceptState,
+    DeadState,
 }
 
 impl State {
-    pub fn transition(&self, input: &Transition) -> Result<State, &str> {
-        match (self, input) {
-            (Self::StartState, Transition::Quote) => Ok(Self::StartQuote),
-            (Self::StartState, _) => Err("State transition error"),
-            (Self::StartQuote, Transition::Quote) => Err("State transition error"),
-            (Self::StartQuote, _) => Ok(Self::AsciiChar),
-            (Self::AsciiChar, Transition::Quote) => Ok(Self::FinalState),
-            (Self::AsciiChar, _) => Ok(Self::AsciiChar),
-            (Self::EndQuote, _) => Err("State transition error"),
-            (Self::FinalState, _) => Ok(Self::DeadendState),
-            (Self::DeadendState, _) => Ok(Self::DeadendState),
+    pub fn transition(&self, transition: &Transition) -> Result<State, &str> {
+        match (self, transition) {
+            (Self::StartState, Transition::Quote) => Ok(Self::SecondState),
+            (Self::StartState, _) => Ok(Self::DeadState),
+            //prolly dont return an error but return a dead_end state?
+            (Self::SecondState, Transition::Quote) => Ok(Self::AcceptState),
+            (Self::SecondState, _) => Ok(Self::ThirdState),
+            (Self::ThirdState, Transition::Quote) => Ok(Self::AcceptState),
+            (Self::ThirdState, _) => Ok(Self::ThirdState),
+            (Self::AcceptState, _) => Err("Already at accept state"),
+            (Self::DeadState, _) => Err("We are at dead state"),
         }
     }
 }
@@ -57,15 +78,30 @@ enum Transition {
 }
 impl Transition {
     //brb
-    pub fn create_transition(item: u8) -> Self {
-        if item.is_ascii_alphabetic() {
+    pub fn create_transition(ch: u8) -> Self {
+        if ch.is_ascii_alphabetic() {
             Self::Alphabet
-        } else if item == b'"' {
+        } else if ch == b'"' {
             Self::Quote
-        } else if item.is_ascii_digit() {
+        } else if ch.is_ascii_digit() {
             Self::Numeric
         } else {
             Self::SpecialChar
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::StringFSM;
+
+    #[test]
+    fn assert_generating_token() -> Result<(), String> {
+        let lexeme_bytes_character = String::from("\"@\"").into_bytes();
+        let mut fsm = StringFSM::init(lexeme_bytes_character);
+        let token = fsm.generate_token()?;
+        println!("State is: {:?}", fsm.give_current_state());
+        println!("Token is: {:?}", token);
+        Ok(())
     }
 }

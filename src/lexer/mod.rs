@@ -48,19 +48,22 @@ impl Lexer {
         let mut reader = BufReader::new(file);
         let mut input_str = String::new();
         let _ = reader.read_to_string(&mut input_str);
+
+        let input_str_bytes_array = input_str.into_bytes();
         Self {
-            input: input_str.into_bytes(),
+            ch: input_str_bytes_array[0],
+            input: input_str_bytes_array,
             tokens: vec![],
             current_position: 0,
-            ch: 0,
         }
     }
     pub fn mock_init(mock_string: String) -> Self {
+        let mock_string_bytes_array = mock_string.into_bytes();
         Self {
-            input: mock_string.into_bytes(),
+            ch: mock_string_bytes_array[0],
+            input: mock_string_bytes_array,
             tokens: vec![],
             current_position: 0,
-            ch: 0,
         }
     }
     fn walk_input(&self) {
@@ -76,15 +79,16 @@ impl Lexer {
             b'"' => {
                 let lexeme = self.get_lexeme();
                 let mut string_fsm = StringFSM::init(lexeme);
-                return Ok(string_fsm.generate_token(self).unwrap());
+                return Ok(string_fsm.generate_token().unwrap());
             }
             _ => return Err("something went wrong"),
         }
     }
     fn get_lexeme(&mut self) -> Vec<u8> {
         let mut chars = Vec::new();
-        while !self.ch.is_ascii_whitespace() {
-            chars.push(self.input[self.current_position]);
+        self.skip_whitespaces();
+        while !self.ch.is_ascii_whitespace() && self.current_position < self.input.len() {
+            chars.push(self.ch);
             self.read_char();
         }
         return chars;
@@ -96,9 +100,15 @@ impl Lexer {
         }
     }
 
+    //when current_position == input.len(), it will not update the ch
     fn read_char(&mut self) {
         self.current_position += 1;
-        self.ch = self.input[self.current_position];
+        if self.current_position < self.input.len() {
+            self.ch = self.input[self.current_position];
+        }
+    }
+    fn give_current_position(&self) -> usize {
+        self.current_position
     }
 }
 #[cfg(test)]
@@ -112,7 +122,7 @@ mod tests {
     //    let mut lexer = Lexer::mock_init(mock_string.clone());
     //
     //    assert_eq!(
-    //        Token::Key(Lexeme::create_lexeme(mock_string.clone(), 8)),
+    //        Token::Key(Lexeme::crate_lexeme(mock_string.clone(), 8)),
     //        lexer.get_next_token().unwrap()
     //    );
     //}
@@ -122,7 +132,21 @@ mod tests {
         let mock_string = " Just testing".to_string();
         let mut lexer = Lexer::mock_init(mock_string.clone());
         let character_bytes = lexer.get_lexeme();
-        let mock_string_slice = &mock_string.as_bytes()[..5];
+
+        let mock_string_slice = &mock_string.as_bytes()[1..5];
         assert_eq!(character_bytes, mock_string_slice);
+        assert_eq!(lexer.give_current_position(), 5);
+        let next_lexem = lexer.get_lexeme();
+        let next_mock_string_slice = &mock_string.as_bytes()[6..];
+        assert_eq!(next_lexem, next_mock_string_slice);
+    }
+
+    #[test]
+    fn assert_skipping_whitespace() {
+        let mock_string = " Just testing".to_string();
+        let mut lexer = Lexer::mock_init(mock_string.clone());
+        lexer.skip_whitespaces();
+        let current_position = lexer.give_current_position();
+        assert_eq!(current_position, 1);
     }
 }
