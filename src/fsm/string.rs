@@ -1,23 +1,28 @@
-use crate::lexer::{Lexer, Token};
+use crate::lexer::{Lexeme, Lexer, Token};
 
 pub struct StringFSM {
     current_state: State,
+    chars: Vec<u8>,
+    chars_length: usize,
 }
 impl StringFSM {
-    pub fn init() -> Self {
+    pub fn init(chars: Vec<u8>) -> Self {
         StringFSM {
             current_state: State::StartState,
+            chars_length: chars.len(),
+            chars,
         }
     }
 
-    //returns Result if error occured during running state machine
+    //I should return the Token with a lexem
     pub fn generate_token(&mut self, lexer: &mut Lexer) -> Result<Token, &str> {
         let transition: Transition = Transition::create_transition(lexer.ch);
 
         while let Ok(state) = self.current_state.transition(&transition) {
             self.current_state = state;
         }
-        return Ok(Token::Key);
+        let lexeme = Lexeme::create_lexeme(String::new(), 2);
+        return Ok(Token::Key(lexeme));
     }
 }
 enum State {
