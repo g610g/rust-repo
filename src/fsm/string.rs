@@ -1,44 +1,53 @@
-use core::str;
+use core::{panic, str};
 
-use crate::lexer::{Lexeme, Token};
+use crate::lexer::{Lexeme, Lexer, Token};
 
 pub struct StringFSM {
-    current_state: State,
+    current_state: StringState,
     chars: Vec<u8>,
-    current_lexeme_ch: u8,
 }
 impl StringFSM {
-    pub fn init(chars: Vec<u8>) -> Self {
+    pub fn init() -> Self {
         StringFSM {
-            current_state: State::StartState,
-            current_lexeme_ch: chars[0],
-            chars,
+            current_state: StringState::StartState,
+            chars: Vec::new(),
         }
     }
-    fn give_current_state(&self) -> &State {
+
+    //This attribute will disable the lint warning for fn's that are unused
+    #[allow(dead_code)]
+    fn give_current_state(&self) -> &StringState {
         &self.current_state
     }
 
     //returns a token variant on success. Otherwise, err
-    pub fn generate_token(&mut self) -> Result<Token, &str> {
-        for ch in self.chars.clone() {
-            let transition = Transition::create_transition(ch);
+    pub fn generate_token(&mut self, lexer: &mut Lexer) -> Result<Token, &str> {
+        let mut transition = Transition::create_transition(lexer.give_current_ch());
+        loop {
             match self.current_state.transition(&transition) {
-                Ok(state) => {
-                    self.current_state = state;
-                }
-                Err(_) => {
-                    return Err("We have an error during creating token with the given lexeme")
-                }
+                Ok(state) => match state {
+                    StringState::AcceptState => {
+                        self.current_state = state;
+                        self.chars.push(lexer.give_current_ch());
+                        break;
+                    }
+                    _ => {
+                        self.current_state = state;
+                        self.chars.push(lexer.give_current_ch());
+                        lexer.read_char();
+                        transition = Transition::create_transition(lexer.give_current_ch());
+                    }
+                },
+                Err(_) => panic!("Err at generating token in string fsm"),
             }
         }
 
         match self.current_state {
-            State::AcceptState => {
+            StringState::AcceptState => {
                 //we should only create a lexeme if this is okay
                 let lexeme_string = str::from_utf8(&self.chars).unwrap();
                 let lexeme = Lexeme::create_lexeme(lexeme_string.to_string(), 21);
-                return Ok(Token::Key(lexeme));
+                return Ok(Token::String(lexeme));
             }
             _ => {
                 return Err("Cannot create token based on the given lexeme");
@@ -47,7 +56,7 @@ impl StringFSM {
     }
 }
 #[derive(Debug)]
-enum State {
+pub enum StringState {
     StartState,
     SecondState,
     ThirdState,
@@ -55,18 +64,17 @@ enum State {
     DeadState,
 }
 
-impl State {
-    pub fn transition(&self, transition: &Transition) -> Result<State, &str> {
+impl StringState {
+    pub fn transition(&self, transition: &Transition) -> Result<StringState, StringState> {
         match (self, transition) {
             (Self::StartState, Transition::Quote) => Ok(Self::SecondState),
-            (Self::StartState, _) => Ok(Self::DeadState),
-            //prolly dont return an error but return a dead_end state?
+            (Self::StartState, _) => Err(Self::DeadState),
             (Self::SecondState, Transition::Quote) => Ok(Self::AcceptState),
             (Self::SecondState, _) => Ok(Self::ThirdState),
             (Self::ThirdState, Transition::Quote) => Ok(Self::AcceptState),
             (Self::ThirdState, _) => Ok(Self::ThirdState),
-            (Self::AcceptState, _) => Err("Already at accept state"),
-            (Self::DeadState, _) => Err("We are at dead state"),
+            (Self::AcceptState, _) => Err(Self::DeadState),
+            (Self::DeadState, _) => Err(Self::DeadState),
         }
     }
 }
@@ -93,13 +101,15 @@ impl Transition {
 
 #[cfg(test)]
 mod tests {
+    use crate::lexer::Lexer;
+
     use super::StringFSM;
 
     #[test]
     fn assert_generating_token() -> Result<(), String> {
-        let lexeme_bytes_character = String::from("\"@\"").into_bytes();
-        let mut fsm = StringFSM::init(lexeme_bytes_character);
-        let token = fsm.generate_token()?;
+        let mut lexer = Lexer::mock_init("\"Hello World \"\"".to_string());
+        let mut fsm = StringFSM::init();
+        let token = fsm.generate_token(&mut lexer)?;
         println!("State is: {:?}", fsm.give_current_state());
         println!("Token is: {:?}", token);
         Ok(())
